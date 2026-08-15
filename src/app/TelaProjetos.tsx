@@ -10,6 +10,7 @@ import {
   useReceitas,
 } from '../dados/repositorio'
 import { novoId, type Projeto, type StatusProjeto } from '../nucleo/tipos'
+import { contarTamanhos, nomesDeTamanhos } from '../nucleo/tamanhos'
 import { formatarDuracao } from './ganchos'
 import { Aviso, Cabecalho, Campo, Confirmacao, Escolha, Miniatura, SeletorFoto, Vazio } from './ui'
 
@@ -91,6 +92,7 @@ export function TelaProjetoEditor({
   const linhas = useLinhas()
   const agulhas = useAgulhas()
   const receitaBase = useReceita(receitaId)
+  const receitaLigada = useReceita(salvo?.receitaId ?? receitaId)
   const [rascunho, setRascunho] = useState<Partial<Projeto> | null>(null)
   const [confirmandoApagar, setConfirmandoApagar] = useState(false)
 
@@ -110,6 +112,9 @@ export function TelaProjetoEditor({
   const projeto = rascunho ?? inicial
 
   const mudar = (mudancas: Partial<Projeto>) => setRascunho({ ...projeto, ...mudancas })
+
+  const quantosTamanhos = contarTamanhos(receitaLigada?.texto ?? '')
+  const nomesTamanhos = nomesDeTamanhos(receitaLigada?.texto ?? '', quantosTamanhos)
 
   const alternar = (campo: 'linhaIds' | 'agulhaIds', valor: string) => {
     const atual = projeto[campo] ?? []
@@ -190,6 +195,19 @@ export function TelaProjetoEditor({
       />
 
       {/* O nome da foto acompanha o andamento: no começo não existe peça pronta. */}
+      {quantosTamanhos >= 2 && (
+        <Escolha
+          rotulo="Tamanho que você está fazendo"
+          ajuda="A receita traz vários tamanhos juntos; o app mostra só os números do seu"
+          valor={projeto.tamanho ?? -1}
+          opcoes={[
+            { valor: -1, texto: 'Ainda não escolhi' },
+            ...nomesTamanhos.map((nome, indice) => ({ valor: indice, texto: nome })),
+          ]}
+          aoMudar={(tamanho) => mudar({ tamanho: tamanho < 0 ? undefined : tamanho })}
+        />
+      )}
+
       <SeletorFoto
         rotulo={projeto.status === 'finalizado' ? 'Foto da peça pronta' : 'Foto de como está ficando'}
         ajuda={

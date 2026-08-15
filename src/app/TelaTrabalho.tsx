@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Navegacao } from './App'
 import { repositorio, useAjustes, useProjeto, useReceita } from '../dados/repositorio'
 import { interpretar, type Carreira } from '../nucleo/interpretador'
+import { aplicarTamanho, contarTamanhos, dependeDoTamanho, nomesDeTamanhos } from '../nucleo/tamanhos'
 import { novoId, type Contador, type Lembrete, type Projeto } from '../nucleo/tipos'
 import { formatarDuracao, useComandoPorVoz, useCronometro, useSom, useTelaAcesa } from './ganchos'
 import { Aviso, Campo, Confirmacao } from './ui'
@@ -45,6 +46,22 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
 
   const leitura = useMemo(() => interpretar(receita?.texto ?? ''), [receita?.texto])
   const linhas = useMemo(() => achatar(leitura.carreiras), [leitura])
+
+  const quantosTamanhos = useMemo(() => contarTamanhos(receita?.texto ?? ''), [receita?.texto])
+  const nomesTamanhos = useMemo(
+    () => nomesDeTamanhos(receita?.texto ?? '', quantosTamanhos),
+    [receita?.texto, quantosTamanhos],
+  )
+  const [verTodosOsTamanhos, setVerTodosOsTamanhos] = useState(false)
+
+  /** Deixa na linha só o número do tamanho que ela está fazendo. */
+  const paraOTamanho = useCallback(
+    (texto: string) =>
+      verTodosOsTamanhos || projeto?.tamanho === undefined
+        ? texto
+        : aplicarTamanho(texto, projeto.tamanho, quantosTamanhos),
+    [verTodosOsTamanhos, projeto?.tamanho, quantosTamanhos],
+  )
 
   const posicao = projeto?.carreiraAtual ?? 0
   const atual = linhas[posicao]
@@ -205,6 +222,34 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
           <div className="travado-aviso">🔒 Contagem travada — destrave para contar</div>
         )}
 
+        {/*
+          Receita de roupa traz todos os tamanhos na mesma linha. Perguntar uma
+          vez e mostrar só o número dela evita o erro mais caro desse tipo de
+          receita: ler o número do tamanho errado no meio do trabalho.
+        */}
+        {quantosTamanhos >= 2 && projeto.tamanho === undefined && (
+          <div className="cartao">
+            <h2>Qual é o seu tamanho?</h2>
+            <p className="suave">
+              Esta receita traz {quantosTamanhos} tamanhos juntos. Escolha o seu e eu mostro só os
+              seus números — dá para trocar depois.
+            </p>
+            <div className="opcoes" style={{ flexDirection: 'column' }}>
+              {nomesTamanhos.map((nome, indice) => (
+                <button
+                  key={nome}
+                  type="button"
+                  className="opcao"
+                  style={{ width: '100%' }}
+                  onClick={() => void gravar({ tamanho: indice })}
+                >
+                  {nome}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {semReceita ? (
           <div className="carreira-atual">
             <div className="rotulo">Carreira</div>
@@ -234,8 +279,22 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
               <div className="instrucao">
                 {atual.carreira.contagemConfiavel
                   ? atual.carreira.resumo
-                  : atual.carreira.textoOriginal}
+                  : paraOTamanho(atual.carreira.textoOriginal)}
               </div>
+
+              {quantosTamanhos >= 2 &&
+                projeto.tamanho !== undefined &&
+                dependeDoTamanho(atual.carreira.textoOriginal, quantosTamanhos) && (
+                  <button
+                    className="botao contorno"
+                    style={{ marginTop: '0.6rem', minHeight: '2.8rem', fontSize: '0.9rem' }}
+                    onClick={() => setVerTodosOsTamanhos((atual) => !atual)}
+                  >
+                    {verTodosOsTamanhos
+                      ? `Mostrar só o ${nomesTamanhos[projeto.tamanho]}`
+                      : 'Ver todos os tamanhos'}
+                  </button>
+                )}
 
               {atual.carreira.contagemConfiavel && atual.carreira.itens.length > 1 && (
                 <ul className="passos">
@@ -274,7 +333,7 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
             {/* Parágrafos que vêm entre as carreiras: repetir bloco, trocar cor. */}
             {recadosAqui.map((recado, indice) => (
               <div key={indice} className="carreira-proxima">
-                {recado}
+                {paraOTamanho(recado)}
               </div>
             ))}
 
@@ -283,7 +342,7 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
                 <strong>Depois vem:</strong>{' '}
                 {proxima.carreira.contagemConfiavel
                   ? proxima.carreira.resumo
-                  : proxima.carreira.textoOriginal}
+                  : paraOTamanho(proxima.carreira.textoOriginal)}
               </div>
             )}
           </>

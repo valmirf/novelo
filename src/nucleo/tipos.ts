@@ -86,6 +86,12 @@ export interface Projeto extends Base {
   fotoId?: string
   notas?: string
   amostraReal?: Amostra
+  /**
+   * Qual tamanho da receita esta peça está seguindo, começando em 0.
+   * Fica no trabalho e não na receita: a mesma receita serve para fazer a peça
+   * em tamanhos diferentes para pessoas diferentes.
+   */
+  tamanho?: number
   /** Trava os botões para não contar sem querer com o trabalho no colo. */
   travado: boolean
 }
