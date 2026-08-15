@@ -1,0 +1,680 @@
+/*
+  Sistema visual do Novelo.
+
+  Pensado para quem tem vista cansada e pouca intimidade com celular:
+  - letra grande de verdade (base 20px, e a pessoa pode aumentar nos ajustes)
+  - contraste alto em todo texto, nada de cinza claro sobre branco
+  - área de toque mínima de 64px, bem acima do mínimo do sistema
+  - nada de ação escondida atrás de deslizar ou apertar e segurar
+  - todo botão tem palavra escrita, ícone nunca aparece sozinho
+*/
+
+:root {
+  --escala: 1;
+
+  --fundo: #fdfaf6;
+  --superficie: #ffffff;
+  --superficie-2: #f4ece3;
+  --borda: #d9c9ba;
+  --borda-forte: #b39d8a;
+
+  --texto: #241a14;
+  --texto-suave: #5c4a3f;
+
+  --marca: #7c4a3a;
+  --marca-clara: #f2e3dc;
+  --marca-texto: #ffffff;
+
+  --alerta: #8a5000;
+  --alerta-fundo: #fdf0dc;
+  --erro: #a3271a;
+  --erro-fundo: #fbe6e3;
+  --certo: #2c6a41;
+  --certo-fundo: #e3f2e8;
+
+  --raio: 1rem;
+  --alvo: 3.4rem;
+  --sombra: 0 1px 3px rgba(60, 40, 30, 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #1a1512;
+    --superficie: #262019;
+    --superficie-2: #332a22;
+    --borda: #4a3e33;
+    --borda-forte: #6d5c4c;
+
+    --texto: #f7f0e8;
+    --texto-suave: #d0bfae;
+
+    --marca: #e8a68d;
+    --marca-clara: #3d2b23;
+    --marca-texto: #241a14;
+
+    --alerta: #f2c078;
+    --alerta-fundo: #3b2e18;
+    --erro: #f2a196;
+    --erro-fundo: #3d201c;
+    --certo: #96d7ae;
+    --certo-fundo: #1d3527;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-size: calc(20px * var(--escala));
+}
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 1rem;
+  line-height: 1.55;
+  /* Evita o zoom por dois toques comer a interface no iPhone. */
+  touch-action: manipulation;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+h1 {
+  font-size: 1.6rem;
+}
+h2 {
+  font-size: 1.25rem;
+}
+h3 {
+  font-size: 1.05rem;
+}
+
+p {
+  margin: 0 0 0.75rem;
+}
+
+/* Foco sempre visível: quem navega por teclado precisa enxergar onde está. */
+:focus-visible {
+  outline: 3px solid var(--marca);
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------- estrutura */
+
+.aplicativo {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+.conteudo {
+  flex: 1;
+  padding: 1rem 1rem 7rem;
+}
+
+.cabecalho {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+  background: var(--fundo);
+  border-bottom: 2px solid var(--borda);
+}
+
+.cabecalho h1 {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ------------------------------------------------------------------ botões */
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: var(--alvo);
+  padding: 0.6rem 1.1rem;
+  border: 2px solid transparent;
+  border-radius: var(--raio);
+  background: var(--superficie-2);
+  color: var(--texto);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.botao:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.botao:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.botao.principal {
+  background: var(--marca);
+  color: var(--marca-texto);
+}
+
+.botao.contorno {
+  background: var(--superficie);
+  border-color: var(--borda-forte);
+}
+
+.botao.perigo {
+  background: var(--erro-fundo);
+  color: var(--erro);
+  border-color: var(--erro);
+}
+
+.botao.largo {
+  width: 100%;
+}
+
+.botao.gigante {
+  min-height: 5rem;
+  font-size: 1.2rem;
+}
+
+.linha-botoes {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.linha-botoes > .botao {
+  flex: 1;
+  min-width: 8rem;
+}
+
+/* ------------------------------------------------------------------ cartões */
+
+.cartao {
+  background: var(--superficie);
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 1rem;
+  margin-bottom: 0.85rem;
+  box-shadow: var(--sombra);
+}
+
+.cartao.clicavel {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.cartao-titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.cartao-linha {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.miniatura {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 0.7rem;
+  object-fit: cover;
+  background: var(--superficie-2);
+  flex-shrink: 0;
+}
+
+.suave {
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+}
+
+.selo {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--marca-clara);
+  color: var(--marca);
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+@media (prefers-color-scheme: dark) {
+  .selo {
+    color: var(--texto);
+  }
+}
+
+.selo.alerta {
+  background: var(--alerta-fundo);
+  color: var(--alerta);
+}
+.selo.certo {
+  background: var(--certo-fundo);
+  color: var(--certo);
+}
+
+/* ---------------------------------------------------------------- formulário */
+
+.campo {
+  display: block;
+  margin-bottom: 1.1rem;
+}
+
+.campo > span {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.campo .ajuda {
+  font-weight: 400;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+  min-height: var(--alvo);
+  padding: 0.6rem 0.75rem;
+  border: 2px solid var(--borda-forte);
+  border-radius: 0.7rem;
+  background: var(--superficie);
+  color: var(--texto);
+  font-family: inherit;
+  /* 1rem aqui já passa de 16px, então o iPhone não dá zoom ao focar. */
+  font-size: 1rem;
+}
+
+.campo textarea {
+  min-height: 12rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.campo-duplo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+.opcoes {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.opcao {
+  flex: 1;
+  min-width: 7rem;
+  min-height: var(--alvo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  border: 2px solid var(--borda-forte);
+  border-radius: 0.7rem;
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.opcao[aria-pressed='true'] {
+  background: var(--marca);
+  border-color: var(--marca);
+  color: var(--marca-texto);
+}
+
+.interruptor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  min-height: var(--alvo);
+  padding: 0.7rem 1rem;
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  text-align: left;
+  margin-bottom: 0.7rem;
+  cursor: pointer;
+}
+
+.interruptor .estado {
+  font-weight: 700;
+  color: var(--marca);
+  white-space: nowrap;
+}
+
+@media (prefers-color-scheme: dark) {
+  .interruptor .estado {
+    color: var(--texto);
+  }
+}
+
+/* ------------------------------------------------------------------- avisos */
+
+.aviso {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--raio);
+  border: 2px solid;
+  margin-bottom: 0.85rem;
+  font-size: 0.95rem;
+}
+
+.aviso.atencao {
+  background: var(--alerta-fundo);
+  border-color: var(--alerta);
+  color: var(--alerta);
+}
+
+.aviso.problema {
+  background: var(--erro-fundo);
+  border-color: var(--erro);
+  color: var(--erro);
+}
+
+.aviso.tudo-certo {
+  background: var(--certo-fundo);
+  border-color: var(--certo);
+  color: var(--certo);
+}
+
+.vazio {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--texto-suave);
+}
+
+.vazio .desenho {
+  font-size: 3.5rem;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+}
+
+/* --------------------------------------------------------------- abas de baixo */
+
+.abas {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  background: var(--superficie);
+  border-top: 2px solid var(--borda);
+  padding-bottom: env(safe-area-inset-bottom);
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+.aba {
+  flex: 1;
+  min-height: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  border: none;
+  background: none;
+  color: var(--texto-suave);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.4rem 0.2rem;
+}
+
+.aba .simbolo {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.aba[aria-current='page'] {
+  color: var(--marca);
+  background: var(--marca-clara);
+}
+
+@media (prefers-color-scheme: dark) {
+  .aba[aria-current='page'] {
+    color: var(--texto);
+  }
+}
+
+/* ------------------------------------------------------------ modo trabalho */
+
+/*
+  A tela de trabalho é uma moldura fixa: só o miolo rola. Assim o botão
+  "Próxima carreira" nunca sai da vista, que é o único botão que ela precisa
+  achar sem procurar, com a agulha na mão.
+*/
+.trabalho {
+  height: 100dvh;
+  max-width: 34rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--fundo);
+}
+
+.trabalho-corpo {
+  flex: 1;
+  min-height: 0;
+  padding: 1rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.carreira-atual {
+  background: var(--superficie);
+  border: 3px solid var(--marca);
+  border-radius: var(--raio);
+  padding: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.carreira-atual .rotulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--marca);
+  margin-bottom: 0.4rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .carreira-atual .rotulo {
+    color: var(--texto);
+  }
+}
+
+.carreira-atual .instrucao {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* A instrução é montada a partir da receita, então a maiúscula vem do estilo. */
+.carreira-atual .instrucao::first-letter,
+.passo::first-letter {
+  text-transform: uppercase;
+}
+
+.carreira-proxima {
+  background: var(--superficie-2);
+  border: 2px dashed var(--borda-forte);
+  border-radius: var(--raio);
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  color: var(--texto-suave);
+}
+
+.passos {
+  list-style: none;
+  margin: 0.8rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.passo {
+  padding: 0.6rem 0.85rem;
+  border-radius: 0.7rem;
+  background: var(--superficie-2);
+  font-size: 1.05rem;
+}
+
+.passo.repeticao {
+  border-left: 5px solid var(--marca);
+}
+
+.contadores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+}
+
+.contador {
+  background: var(--superficie);
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 0.8rem;
+  text-align: center;
+}
+
+.contador .nome {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--texto-suave);
+  margin-bottom: 0.2rem;
+}
+
+.contador .valor {
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.contador .voltas {
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+
+.contador-botoes {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.contador-botoes .botao {
+  flex: 1;
+  min-height: 3rem;
+  padding: 0.4rem;
+  font-size: 1.2rem;
+}
+
+.trabalho-rodape {
+  flex-shrink: 0;
+  background: var(--superficie);
+  border-top: 2px solid var(--borda);
+  padding: 0.8rem 1rem;
+  padding-bottom: max(0.8rem, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.cronometro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.cronometro .tempo {
+  font-size: 1.8rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.travado-aviso {
+  text-align: center;
+  font-weight: 700;
+  color: var(--alerta);
+}
+
+/* --------------------------------------------------------------- diálogo */
+
+.fundo-escuro {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(20, 12, 8, 0.55);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.dialogo {
+  width: 100%;
+  max-width: 32rem;
+  background: var(--superficie);
+  border-radius: var(--raio);
+  padding: 1.25rem;
+  max-height: 85dvh;
+  overflow-y: auto;
+  margin-bottom: env(safe-area-inset-bottom);
+}
+
+.dialogo h2 {
+  margin-bottom: 0.6rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
