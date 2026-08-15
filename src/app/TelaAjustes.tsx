@@ -21,7 +21,9 @@ export function TelaAjustes() {
     setOcupado(true)
     setErro(undefined)
     try {
-      baixarBackup(await gerarBackup())
+      if ((await baixarBackup(await gerarBackup())) === 'recusado') {
+        setErro('A cópia não foi salva. Toque de novo e confirme para guardar o arquivo.')
+      }
     } catch {
       setErro('Não consegui gerar a cópia. Tente de novo.')
     } finally {

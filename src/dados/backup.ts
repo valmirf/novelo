@@ -68,17 +68,57 @@ export async function gerarBackup(): Promise<ArquivoBackup> {
   }
 }
 
-export function baixarBackup(dados: ArquivoBackup): void {
+export type ResultadoDownload = 'salvo' | 'recusado'
+
+/**
+ * Entrega o arquivo de cópia para a pessoa guardar.
+ *
+ * São dois caminhos porque são dois lugares onde o app roda. No navegador comum
+ * vale o link de download de sempre. Já quando o Novelo está publicado como
+ * página no claude.ai, links de download não funcionam — lá é preciso pedir ao
+ * hospedeiro, que mostra uma confirmação e pode ser recusado.
+ */
+export async function baixarBackup(dados: ArquivoBackup): Promise<ResultadoDownload> {
   const data = new Date().toISOString().slice(0, 10)
-  const blob = new Blob([JSON.stringify(dados)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
+  const nome = `novelo-backup-${data}.json`
+  const conteudo = JSON.stringify(dados)
+
+  const salvador = await acharSalvador()
+  if (salvador) {
+    try {
+      await salvador.save({ filename: nome, data: conteudo })
+      return 'salvo'
+    } catch (problema) {
+      if ((problema as { code?: string })?.code === 'declined') return 'recusado'
+      throw problema
+    }
+  }
+
+  const url = URL.createObjectURL(new Blob([conteudo], { type: 'application/json' }))
   const link = document.createElement('a')
   link.href = url
-  link.download = `novelo-backup-${data}.json`
+  link.download = nome
   document.body.append(link)
   link.click()
   link.remove()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
+  return 'salvo'
+}
+
+interface SalvadorDeArquivo {
+  save(pedido: { filename: string; data: string }): Promise<{ status: 'saved' }>
+}
+
+async function acharSalvador(): Promise<SalvadorDeArquivo | null> {
+  const janela = window as unknown as {
+    claude?: { use?: (nome: string) => Promise<unknown> }
+  }
+  if (!janela.claude?.use) return null
+  try {
+    return ((await janela.claude.use('downloads')) as SalvadorDeArquivo | null) ?? null
+  } catch {
+    return null
+  }
 }
 
 export interface ResultadoImportacao {
