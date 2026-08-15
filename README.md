@@ -23,6 +23,7 @@ src/
   nucleo/          regras que não dependem de tela
     lexico.ts        pontos de crochê e tricô em PT-BR, com o que cada um consome e produz
     interpretador.ts lê o texto da receita e devolve as carreiras expandidas
+    pdf.ts           extrai o texto de uma receita em PDF, preservando as linhas
     amostra.ts       conversão de amostra (quantos pontos montar)
     tipos.ts         modelo de dados
   dados/           persistência
@@ -50,6 +51,18 @@ receita, todos só contam. Este entende, em português:
 Cada ponto declara quanto **consome** da carreira anterior e quanto **produz** na
 nova. Dessa dupla sai a contagem automática — e a conferência: quando a receita
 declara `= 24` e a conta dá outro número, o app avisa antes de a peça sair errada.
+
+### Receita em PDF
+
+Como a maior parte das receitas circula em PDF, o editor lê o arquivo direto.
+O detalhe que importa é a reconstrução das linhas: o PDF não guarda linhas,
+guarda pedaços de texto com coordenadas. Juntar tudo num parágrafo destruiria a
+receita, porque o interpretador é feito de uma carreira por linha — então
+`pdf.ts` agrupa os pedaços por altura na página e ordena por posição.
+
+PDF feito de imagem escaneada não tem texto para extrair; nesse caso o app diz
+isso em português em vez de devolver um texto vazio. Não há reconhecimento de
+imagem (OCR).
 
 ## Decisões que valem saber
 

@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { Navegacao } from './App'
 import { repositorio, useReceita, useReceitas } from '../dados/repositorio'
 import { interpretar } from '../nucleo/interpretador'
+import { lerPdf } from '../nucleo/pdf'
 import type { Receita, TipoTrabalho } from '../nucleo/tipos'
 import { Aviso, Cabecalho, Campo, Confirmacao, Escolha, Miniatura, SeletorFoto, Vazio } from './ui'
 
@@ -78,6 +79,11 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
   const [rascunho, setRascunho] = useState<Partial<Receita> | null>(null)
   const [confirmandoApagar, setConfirmandoApagar] = useState(false)
 
+  const entradaPdf = useRef<HTMLInputElement>(null)
+  const [lendoPdf, setLendoPdf] = useState(false)
+  const [avisoPdf, setAvisoPdf] = useState<{ tipo: 'atencao' | 'tudo-certo'; texto: string }>()
+  const [pdfParaSubstituir, setPdfParaSubstituir] = useState<string>()
+
   // Enquanto a pessoa não mexeu em nada, mostramos o que está no banco.
   const receita: Partial<Receita> = rascunho ?? salva ?? { tipo: 'croche', texto: '' }
   const mexeu = rascunho !== null
@@ -86,6 +92,53 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
 
   const leitura = useMemo(() => interpretar(receita.texto ?? ''), [receita.texto])
   const comProblema = leitura.carreiras.filter((c) => c.divergencia)
+
+  // Carreiras de verdade, não entradas de texto: "Carr 5-10" é uma linha escrita
+  // mas seis carreiras para tricotar, e é esse número que faz sentido para ela.
+  const quantasCarreiras = leitura.carreiras.reduce((soma, c) => soma + c.numeros.length, 0)
+
+  const escolherPdf = async (arquivo: File | undefined) => {
+    if (entradaPdf.current) entradaPdf.current.value = ''
+    if (!arquivo) return
+
+    setLendoPdf(true)
+    setAvisoPdf(undefined)
+    try {
+      const lido = await lerPdf(arquivo)
+
+      if (lido.pareceDigitalizado) {
+        setAvisoPdf({
+          tipo: 'atencao',
+          texto:
+            'Esse PDF é uma imagem, não texto — dá para ver a receita, mas não dá para copiar dela. ' +
+            'Nesse caso é digitar à mão, e vale guardar a foto da receita aqui do lado.',
+        })
+        return
+      }
+
+      const jaTemTexto = (receita.texto ?? '').trim().length > 0
+      if (jaTemTexto) {
+        setPdfParaSubstituir(lido.texto)
+        return
+      }
+
+      mudar({ texto: lido.texto })
+      setAvisoPdf({
+        tipo: 'tudo-certo',
+        texto:
+          lido.paginas === 1
+            ? 'Li o PDF. Confira o texto abaixo antes de salvar.'
+            : `Li as ${lido.paginas} páginas do PDF. Confira o texto abaixo antes de salvar.`,
+      })
+    } catch {
+      setAvisoPdf({
+        tipo: 'atencao',
+        texto: 'Não consegui abrir esse arquivo. Confira se é mesmo um PDF.',
+      })
+    } finally {
+      setLendoPdf(false)
+    }
+  }
 
   const salvar = async () => {
     const titulo = (receita.titulo ?? '').trim()
@@ -134,6 +187,25 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
         aoTrocar={(fotoId) => mudar({ fotoId })}
       />
 
+      <input
+        ref={entradaPdf}
+        type="file"
+        accept="application/pdf,.pdf"
+        hidden
+        onChange={(evento) => void escolherPdf(evento.target.files?.[0])}
+      />
+      <button
+        type="button"
+        className="botao contorno largo"
+        style={{ marginBottom: '1.1rem' }}
+        disabled={lendoPdf}
+        onClick={() => entradaPdf.current?.click()}
+      >
+        {lendoPdf ? 'Lendo o PDF…' : 'Trazer a receita de um PDF'}
+      </button>
+
+      {avisoPdf && <Aviso tipo={avisoPdf.tipo}>{avisoPdf.texto}</Aviso>}
+
       <Campo rotulo="A receita" ajuda="Uma carreira por linha, começando por “Carreira 1:”">
         <textarea
           value={receita.texto ?? ''}
@@ -153,9 +225,9 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
 
           {leitura.carreiras.length > 0 && comProblema.length === 0 && (
             <Aviso tipo="tudo-certo">
-              {leitura.carreiras.length === 1
+              {quantasCarreiras === 1
                 ? 'Entendi 1 carreira e as contas batem.'
-                : `Entendi ${leitura.carreiras.length} carreiras e as contas batem.`}
+                : `Entendi ${quantasCarreiras} carreiras e as contas batem.`}
             </Aviso>
           )}
 
@@ -271,6 +343,23 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
             Apagar esta receita
           </button>
         </>
+      )}
+
+      {pdfParaSubstituir !== undefined && (
+        <Confirmacao
+          titulo="Substituir o que está escrito?"
+          texto="Já existe uma receita escrita aqui. O texto do PDF vai tomar o lugar dela."
+          confirmar="Sim, usar o PDF"
+          aoConfirmar={() => {
+            mudar({ texto: pdfParaSubstituir })
+            setPdfParaSubstituir(undefined)
+            setAvisoPdf({
+              tipo: 'tudo-certo',
+              texto: 'Li o PDF. Confira o texto abaixo antes de salvar.',
+            })
+          }}
+          aoCancelar={() => setPdfParaSubstituir(undefined)}
+        />
       )}
 
       {confirmandoApagar && (
