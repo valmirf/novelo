@@ -102,13 +102,22 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
   // mas seis carreiras para tricotar, e é esse número que faz sentido para ela.
   const quantasCarreiras = leitura.carreiras.reduce((soma, c) => soma + c.numeros.length, 0)
 
-  const escolherPdf = async (arquivo: File | undefined) => {
+  const escolherArquivo = async (arquivo: File | undefined) => {
     if (entradaPdf.current) entradaPdf.current.value = ''
     if (!arquivo) return
 
     setLendoPdf(true)
     setAvisoPdf(undefined)
     try {
+      const ehPdf =
+        arquivo.type === 'application/pdf' || arquivo.name.toLowerCase().endsWith('.pdf')
+
+      // Arquivo de texto não precisa de nada: é a receita já pronta.
+      if (!ehPdf) {
+        aproveitarTexto(await arquivo.text(), 'Li o arquivo. Confira o texto antes de salvar.')
+        return
+      }
+
       const lido = await lerPdf(arquivo)
 
       if (lido.pareceDigitalizado) {
@@ -123,29 +132,30 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
       }
 
       setPdfEscaneado(undefined)
-
-      const jaTemTexto = (receita.texto ?? '').trim().length > 0
-      if (jaTemTexto) {
-        setPdfParaSubstituir(lido.texto)
-        return
-      }
-
-      mudar({ texto: lido.texto })
-      setAvisoPdf({
-        tipo: 'tudo-certo',
-        texto:
-          lido.paginas === 1
-            ? 'Li o PDF. Confira o texto abaixo antes de salvar.'
-            : `Li as ${lido.paginas} páginas do PDF. Confira o texto abaixo antes de salvar.`,
-      })
+      aproveitarTexto(
+        lido.texto,
+        lido.paginas === 1
+          ? 'Li o PDF. Confira o texto antes de salvar.'
+          : `Li as ${lido.paginas} páginas do PDF. Confira o texto antes de salvar.`,
+      )
     } catch {
       setAvisoPdf({
         tipo: 'atencao',
-        texto: 'Não consegui abrir esse arquivo. Confira se é mesmo um PDF.',
+        texto: 'Não consegui abrir esse arquivo. Ele precisa ser um PDF ou um arquivo de texto.',
       })
     } finally {
       setLendoPdf(false)
     }
+  }
+
+  /** Põe o texto lido no campo, perguntando antes se já havia algo escrito. */
+  const aproveitarTexto = (texto: string, recado: string) => {
+    if ((receita.texto ?? '').trim().length > 0) {
+      setPdfParaSubstituir(texto)
+      return
+    }
+    mudar({ texto })
+    setAvisoPdf({ tipo: 'tudo-certo', texto: recado })
   }
 
   const salvar = async () => {
@@ -172,27 +182,43 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
       <Cabecalho titulo={id ? 'Editar receita' : 'Receita nova'} aoVoltar={navegacao.voltar} />
 
       {/*
-        A entrada por PDF vem antes de tudo de propósito: é assim que a maior
-        parte das receitas chega, e escondida lá embaixo ninguém achava.
+        A receita vem antes de tudo: é o que a pessoa tem na mão e o motivo de
+        estar aqui. O arquivo é um caminho para preencher esse campo, não um
+        assunto à parte — ninguém pensa "tenho um PDF", pensa "tenho a receita".
       */}
-      <input
-        ref={entradaPdf}
-        type="file"
-        accept="application/pdf,.pdf"
-        hidden
-        onChange={(evento) => void escolherPdf(evento.target.files?.[0])}
-      />
-      <button
-        type="button"
-        className="botao principal largo gigante"
-        disabled={lendoPdf}
-        onClick={() => entradaPdf.current?.click()}
-      >
-        {lendoPdf ? 'Lendo o PDF…' : '📄 Tenho a receita em PDF'}
-      </button>
-      <p className="suave" style={{ marginTop: '0.5rem', marginBottom: '1.4rem' }}>
-        Escolha o arquivo e eu trago a receita escrita para você. Ou preencha à mão abaixo.
-      </p>
+      <div className="campo">
+        <span>
+          A receita
+          <br />
+          <span className="ajuda">
+            Uma carreira por linha, começando por “Carreira 1:”. Você pode colar o texto, digitar,
+            ou trazer de um arquivo.
+          </span>
+        </span>
+
+        <input
+          ref={entradaPdf}
+          type="file"
+          accept="application/pdf,.pdf,text/plain,.txt"
+          hidden
+          onChange={(evento) => void escolherArquivo(evento.target.files?.[0])}
+        />
+        <button
+          type="button"
+          className="botao contorno largo"
+          style={{ marginBottom: '0.6rem' }}
+          disabled={lendoPdf}
+          onClick={() => entradaPdf.current?.click()}
+        >
+          {lendoPdf ? 'Lendo o arquivo…' : '📄 Trazer de um arquivo (PDF ou texto)'}
+        </button>
+
+        <textarea
+          value={receita.texto ?? ''}
+          placeholder={EXEMPLO}
+          onChange={(evento) => mudar({ texto: evento.target.value })}
+        />
+      </div>
 
       {avisoPdf && <Aviso tipo={avisoPdf.tipo}>{avisoPdf.texto}</Aviso>}
 
@@ -222,19 +248,6 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
         aoMudar={(tipo) => mudar({ tipo })}
       />
 
-      <SeletorFoto
-        rotulo="Foto da peça pronta"
-        fotoId={receita.fotoId}
-        aoTrocar={(fotoId) => mudar({ fotoId })}
-      />
-
-      <Campo rotulo="A receita" ajuda="Uma carreira por linha, começando por “Carreira 1:”">
-        <textarea
-          value={receita.texto ?? ''}
-          placeholder={EXEMPLO}
-          onChange={(evento) => mudar({ texto: evento.target.value })}
-        />
-      </Campo>
 
       {(receita.texto ?? '').trim().length > 0 && (
         <div className="cartao">
@@ -273,9 +286,20 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
 
       <details className="cartao">
         <summary style={{ fontWeight: 700, minHeight: '2.5rem', cursor: 'pointer' }}>
-          Linha, agulha e amostra
+          Foto, linha, agulha e amostra — se você tiver
         </summary>
         <div style={{ marginTop: '1rem' }}>
+          {/*
+            Tudo aqui é opcional e fica fechado por padrão. A peça ainda não
+            existe neste momento, então nem foto pronta cabe; e nem toda receita
+            vem com foto de referência. Quem guarda a foto do trabalho é o projeto.
+          */}
+          <SeletorFoto
+            rotulo="Foto de referência"
+            ajuda="A que veio junto da receita, mostrando como a peça deve ficar."
+            fotoId={receita.fotoId}
+            aoTrocar={(fotoId) => mudar({ fotoId })}
+          />
           <Campo rotulo="Linha indicada">
             <input
               type="text"

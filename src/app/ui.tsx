@@ -217,10 +217,12 @@ export function SeletorFoto({
   fotoId,
   aoTrocar,
   rotulo = 'Foto',
+  ajuda,
 }: {
   fotoId?: string
   aoTrocar: (fotoId: string | undefined) => void
   rotulo?: string
+  ajuda?: string
 }) {
   const url = useFoto(fotoId)
   const entrada = useRef<HTMLInputElement>(null)
@@ -240,7 +242,15 @@ export function SeletorFoto({
 
   return (
     <div className="campo">
-      <span>{rotulo}</span>
+      <span>
+        {rotulo}
+        {ajuda && (
+          <>
+            <br />
+            <span className="ajuda">{ajuda}</span>
+          </>
+        )}
+      </span>
       {url && (
         <img
           src={url}

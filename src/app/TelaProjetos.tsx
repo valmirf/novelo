@@ -189,8 +189,14 @@ export function TelaProjetoEditor({
         aoMudar={(status) => mudar({ status })}
       />
 
+      {/* O nome da foto acompanha o andamento: no começo não existe peça pronta. */}
       <SeletorFoto
-        rotulo="Foto da peça"
+        rotulo={projeto.status === 'finalizado' ? 'Foto da peça pronta' : 'Foto de como está ficando'}
+        ajuda={
+          projeto.status === 'finalizado'
+            ? 'O registro da peça terminada.'
+            : 'Vale fotografar durante o trabalho. No fim, troque pela foto da peça pronta.'
+        }
         fotoId={projeto.fotoId}
         aoTrocar={(fotoId) => mudar({ fotoId })}
       />
