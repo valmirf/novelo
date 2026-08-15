@@ -3,25 +3,29 @@ import { desenharPagina } from '../nucleo/pdf'
 import { Aviso } from './ui'
 
 /**
- * O que fazer quando o PDF é imagem escaneada.
+ * Receita que chegou como imagem: print do Instagram, foto da revista, ou PDF
+ * escaneado — nos três casos não há texto para extrair.
  *
- * A página é mostrada como imagem para o próprio celular ler: iPhone e Android
- * já vêm com reconhecimento de texto muito bom, de graça e sem instalar nada.
- * Sai bem melhor do que qualquer reconhecedor que coubesse dentro do app.
+ * Em vez de embutir um reconhecedor de imagem, a receita é mostrada e quem lê é
+ * o próprio celular: iPhone e Android já trazem reconhecimento de texto, de
+ * graça, melhor do que caberia aqui dentro.
  */
-export function PdfEscaneado({
+export function ReceitaEmImagem({
   arquivo,
   paginas,
   aoFechar,
 }: {
   arquivo: File
-  paginas: number
+  /** Só para PDF. Imagem solta não tem páginas. */
+  paginas?: number
   aoFechar: () => void
 }) {
   const [pagina, setPagina] = useState(1)
   const [url, setUrl] = useState<string>()
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState<string>()
+
+  const ehPdf = paginas !== undefined
 
   useEffect(() => {
     let cancelado = false
@@ -30,14 +34,18 @@ export function PdfEscaneado({
     setCarregando(true)
     setErro(undefined)
 
-    desenharPagina(arquivo, pagina)
+    const preparar = ehPdf
+      ? desenharPagina(arquivo, pagina)
+      : Promise.resolve(arquivo as Blob)
+
+    preparar
       .then((imagem) => {
         if (cancelado) return
         criada = URL.createObjectURL(imagem)
         setUrl(criada)
       })
       .catch(() => {
-        if (!cancelado) setErro('Não consegui mostrar essa página.')
+        if (!cancelado) setErro('Não consegui mostrar essa receita.')
       })
       .finally(() => {
         if (!cancelado) setCarregando(false)
@@ -47,7 +55,7 @@ export function PdfEscaneado({
       cancelado = true
       if (criada) URL.revokeObjectURL(criada)
     }
-  }, [arquivo, pagina])
+  }, [arquivo, pagina, ehPdf])
 
   return (
     <div className="cartao">
@@ -57,12 +65,12 @@ export function PdfEscaneado({
       {erro && <Aviso tipo="problema">{erro}</Aviso>}
 
       {carregando ? (
-        <p>Preparando a página…</p>
+        <p>Preparando a receita…</p>
       ) : (
         url && (
           <img
             src={url}
-            alt={`Página ${pagina} da receita`}
+            alt={ehPdf ? `Página ${pagina} da receita` : 'Receita'}
             style={{
               width: '100%',
               border: '2px solid var(--borda)',
@@ -73,7 +81,7 @@ export function PdfEscaneado({
         )
       )}
 
-      {paginas > 1 && (
+      {ehPdf && paginas > 1 && (
         <div className="linha-botoes" style={{ marginTop: '0.8rem' }}>
           <button
             className="botao contorno"
@@ -93,8 +101,8 @@ export function PdfEscaneado({
       )}
 
       <p className="suave" style={{ marginTop: '0.8rem' }}>
-        {paginas > 1 ? `Página ${pagina} de ${paginas}.` : 'Página única.'} Depois de colar, confira
-        o texto — reconhecimento de imagem às vezes troca número.
+        {ehPdf && paginas > 1 ? `Página ${pagina} de ${paginas}. ` : ''}
+        Depois de colar, confira o texto — reconhecimento de imagem às vezes troca número.
       </p>
 
       <button className="botao contorno largo" onClick={aoFechar}>

@@ -3,7 +3,7 @@ import type { Navegacao } from './App'
 import { repositorio, useReceita, useReceitas } from '../dados/repositorio'
 import { interpretar } from '../nucleo/interpretador'
 import { lerPdf } from '../nucleo/pdf'
-import { PdfEscaneado } from './PdfEscaneado'
+import { ReceitaEmImagem } from './ReceitaEmImagem'
 import type { Receita, TipoTrabalho } from '../nucleo/tipos'
 import { Aviso, Cabecalho, Campo, Confirmacao, Escolha, Miniatura, SeletorFoto, Vazio } from './ui'
 
@@ -28,7 +28,7 @@ export function TelaReceitas({ navegacao }: { navegacao: Navegacao }) {
         <span aria-hidden="true">＋</span> Guardar uma receita nova
       </button>
       <p className="suave" style={{ marginTop: '0.5rem' }}>
-        Você pode trazer de um arquivo PDF ou escrever à mão.
+        Você pode trazer de um PDF, de uma foto da receita, ou escrever à mão.
       </p>
 
       {receitas.length > 3 && (
@@ -49,7 +49,7 @@ export function TelaReceitas({ navegacao }: { navegacao: Navegacao }) {
           <Vazio
             desenho="📖"
             titulo="Nenhuma receita ainda"
-            texto="Guarde aqui as receitas que você usa. Pode trazer de um arquivo PDF, copiar de um site ou digitar do caderno."
+            texto="Guarde aqui as receitas que você usa. Pode trazer de um PDF, de um print do Instagram, copiar de um site ou digitar do caderno."
           />
         ) : filtradas.length === 0 ? (
           <Vazio desenho="🔎" titulo="Nada encontrado" texto="Nenhuma receita com esse nome." />
@@ -87,7 +87,8 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
   const [lendoPdf, setLendoPdf] = useState(false)
   const [avisoPdf, setAvisoPdf] = useState<{ tipo: 'atencao' | 'tudo-certo'; texto: string }>()
   const [pdfParaSubstituir, setPdfParaSubstituir] = useState<string>()
-  const [pdfEscaneado, setPdfEscaneado] = useState<{ arquivo: File; paginas: number }>()
+  // `paginas` só existe quando a receita veio em PDF; foto solta não tem páginas.
+  const [receitaEmImagem, setReceitaEmImagem] = useState<{ arquivo: File; paginas?: number }>()
 
   // Enquanto a pessoa não mexeu em nada, mostramos o que está no banco.
   const receita: Partial<Receita> = rascunho ?? salva ?? { tipo: 'croche', texto: '' }
@@ -109,11 +110,25 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
     setLendoPdf(true)
     setAvisoPdf(undefined)
     try {
-      const ehPdf =
-        arquivo.type === 'application/pdf' || arquivo.name.toLowerCase().endsWith('.pdf')
+      const nome = arquivo.name.toLowerCase()
+      const ehPdf = arquivo.type === 'application/pdf' || nome.endsWith('.pdf')
+      const ehImagem = arquivo.type.startsWith('image/')
 
-      // Arquivo de texto não precisa de nada: é a receita já pronta.
+      // Print do Instagram, foto da revista: não há texto, só imagem. Vai direto
+      // para o caminho de copiar pelo celular.
+      if (ehImagem) {
+        setReceitaEmImagem({ arquivo })
+        setAvisoPdf({
+          tipo: 'atencao',
+          texto:
+            'Isso é uma foto, então não tem texto para eu copiar. ' +
+            'Mas o seu celular sabe ler texto de imagem — siga o passo a passo abaixo.',
+        })
+        return
+      }
+
       if (!ehPdf) {
+        // Não é anunciado na tela, mas se vier um arquivo de texto, aproveita.
         aproveitarTexto(await arquivo.text(), 'Li o arquivo. Confira o texto antes de salvar.')
         return
       }
@@ -121,7 +136,7 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
       const lido = await lerPdf(arquivo)
 
       if (lido.pareceDigitalizado) {
-        setPdfEscaneado({ arquivo, paginas: lido.paginas })
+        setReceitaEmImagem({ arquivo, paginas: lido.paginas })
         setAvisoPdf({
           tipo: 'atencao',
           texto:
@@ -131,7 +146,7 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
         return
       }
 
-      setPdfEscaneado(undefined)
+      setReceitaEmImagem(undefined)
       aproveitarTexto(
         lido.texto,
         lido.paginas === 1
@@ -141,7 +156,7 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
     } catch {
       setAvisoPdf({
         tipo: 'atencao',
-        texto: 'Não consegui abrir esse arquivo. Ele precisa ser um PDF ou um arquivo de texto.',
+        texto: 'Não consegui abrir esse arquivo. Ele precisa ser um PDF, uma foto ou um texto.',
       })
     } finally {
       setLendoPdf(false)
@@ -192,14 +207,14 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
           <br />
           <span className="ajuda">
             Uma carreira por linha, começando por “Carreira 1:”. Você pode colar o texto, digitar,
-            ou trazer de um arquivo.
+            ou trazer de um arquivo — PDF, foto da receita, ou arquivo de texto.
           </span>
         </span>
 
         <input
           ref={entradaPdf}
           type="file"
-          accept="application/pdf,.pdf,text/plain,.txt"
+          accept="application/pdf,.pdf,image/*,text/plain,.txt"
           hidden
           onChange={(evento) => void escolherArquivo(evento.target.files?.[0])}
         />
@@ -210,7 +225,7 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
           disabled={lendoPdf}
           onClick={() => entradaPdf.current?.click()}
         >
-          {lendoPdf ? 'Lendo o arquivo…' : '📄 Trazer de um arquivo (PDF ou texto)'}
+          {lendoPdf ? 'Lendo o arquivo…' : '📄 Trazer de um arquivo ou foto'}
         </button>
 
         <textarea
@@ -222,11 +237,11 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
 
       {avisoPdf && <Aviso tipo={avisoPdf.tipo}>{avisoPdf.texto}</Aviso>}
 
-      {pdfEscaneado && (
-        <PdfEscaneado
-          arquivo={pdfEscaneado.arquivo}
-          paginas={pdfEscaneado.paginas}
-          aoFechar={() => setPdfEscaneado(undefined)}
+      {receitaEmImagem && (
+        <ReceitaEmImagem
+          arquivo={receitaEmImagem.arquivo}
+          paginas={receitaEmImagem.paginas}
+          aoFechar={() => setReceitaEmImagem(undefined)}
         />
       )}
 
