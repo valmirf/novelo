@@ -8,6 +8,33 @@
 // Só tipo: some na compilação, então não puxa o pdf.js para o pacote principal.
 import type { PDFDocumentProxy } from 'pdfjs-dist'
 
+/**
+ * Descobre o que é o arquivo olhando o conteúdo, não o nome.
+ *
+ * O iPhone às vezes entrega o arquivo sem tipo e sem extensão — vindo do app
+ * Arquivos, do WhatsApp ou de um anexo de e-mail. Aí só os primeiros bytes
+ * dizem a verdade. Todo PDF começa com "%PDF-".
+ */
+export async function descobrirTipo(arquivo: File | Blob): Promise<'pdf' | 'imagem' | 'texto'> {
+  const inicio = new Uint8Array(await arquivo.slice(0, 12).arrayBuffer())
+  const assinatura = (bytes: number[]) => bytes.every((b, i) => inicio[i] === b)
+
+  if (assinatura([0x25, 0x50, 0x44, 0x46])) return 'pdf' // %PDF
+  if (assinatura([0xff, 0xd8, 0xff])) return 'imagem' // JPEG
+  if (assinatura([0x89, 0x50, 0x4e, 0x47])) return 'imagem' // PNG
+  if (assinatura([0x47, 0x49, 0x46])) return 'imagem' // GIF
+  // HEIC e WebP guardam o tipo depois do tamanho, na posição 4.
+  const marca = String.fromCharCode(...inicio.slice(4, 12))
+  if (/^ftyp(heic|heif|hevc|mif1|msf1)/.test(marca)) return 'imagem'
+  if (/^WEBP/.test(String.fromCharCode(...inicio.slice(8, 12)))) return 'imagem'
+
+  const nome = 'name' in arquivo ? arquivo.name.toLowerCase() : ''
+  if (arquivo.type.startsWith('image/') || /\.(jpe?g|png|gif|heic|heif|webp|bmp)$/.test(nome)) {
+    return 'imagem'
+  }
+  return 'texto'
+}
+
 /** Sobra da mesma linha: itens com altura parecida pertencem à mesma carreira. */
 const TOLERANCIA_LINHA = 3
 
