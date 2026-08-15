@@ -3,6 +3,7 @@ import type { Navegacao } from './App'
 import { repositorio, useReceita, useReceitas } from '../dados/repositorio'
 import { interpretar } from '../nucleo/interpretador'
 import { lerPdf } from '../nucleo/pdf'
+import { PdfEscaneado } from './PdfEscaneado'
 import type { Receita, TipoTrabalho } from '../nucleo/tipos'
 import { Aviso, Cabecalho, Campo, Confirmacao, Escolha, Miniatura, SeletorFoto, Vazio } from './ui'
 
@@ -83,6 +84,7 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
   const [lendoPdf, setLendoPdf] = useState(false)
   const [avisoPdf, setAvisoPdf] = useState<{ tipo: 'atencao' | 'tudo-certo'; texto: string }>()
   const [pdfParaSubstituir, setPdfParaSubstituir] = useState<string>()
+  const [pdfEscaneado, setPdfEscaneado] = useState<{ arquivo: File; paginas: number }>()
 
   // Enquanto a pessoa não mexeu em nada, mostramos o que está no banco.
   const receita: Partial<Receita> = rascunho ?? salva ?? { tipo: 'croche', texto: '' }
@@ -107,14 +109,17 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
       const lido = await lerPdf(arquivo)
 
       if (lido.pareceDigitalizado) {
+        setPdfEscaneado({ arquivo, paginas: lido.paginas })
         setAvisoPdf({
           tipo: 'atencao',
           texto:
-            'Esse PDF é uma imagem, não texto — dá para ver a receita, mas não dá para copiar dela. ' +
-            'Nesse caso é digitar à mão, e vale guardar a foto da receita aqui do lado.',
+            'Esse PDF é uma imagem escaneada, então não tem texto para eu copiar. ' +
+            'Mas o seu celular sabe ler texto de imagem — siga o passo a passo abaixo.',
         })
         return
       }
+
+      setPdfEscaneado(undefined)
 
       const jaTemTexto = (receita.texto ?? '').trim().length > 0
       if (jaTemTexto) {
@@ -205,6 +210,14 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
       </button>
 
       {avisoPdf && <Aviso tipo={avisoPdf.tipo}>{avisoPdf.texto}</Aviso>}
+
+      {pdfEscaneado && (
+        <PdfEscaneado
+          arquivo={pdfEscaneado.arquivo}
+          paginas={pdfEscaneado.paginas}
+          aoFechar={() => setPdfEscaneado(undefined)}
+        />
+      )}
 
       <Campo rotulo="A receita" ajuda="Uma carreira por linha, começando por “Carreira 1:”">
         <textarea

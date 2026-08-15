@@ -5,6 +5,9 @@
 // que é o que mais importa: o interpretador é feito de uma carreira por linha,
 // então juntar tudo num parágrafo só destruiria a receita.
 
+// Só tipo: some na compilação, então não puxa o pdf.js para o pacote principal.
+import type { PDFDocumentProxy } from 'pdfjs-dist'
+
 /** Sobra da mesma linha: itens com altura parecida pertencem à mesma carreira. */
 const TOLERANCIA_LINHA = 3
 
@@ -44,18 +47,44 @@ function carregarPdfjs() {
   return pdfjsCarregado
 }
 
-export async function lerPdf(arquivo: File | Blob): Promise<LeituraPdf> {
+/**
+ * Uma leitura por vez.
+ *
+ * O pdf.js escolhe o trabalhador por uma variável global, e encerrar uma leitura
+ * encerra o trabalhador junto. Duas leituras ao mesmo tempo acabam dividindo o
+ * mesmo trabalhador, e a primeira a terminar deixa a outra pendurada para sempre.
+ */
+let fila: Promise<unknown> = Promise.resolve()
+
+function enfileirar<T>(trabalho: () => Promise<T>): Promise<T> {
+  const proxima = fila.then(trabalho, trabalho)
+  fila = proxima.catch(() => undefined)
+  return proxima
+}
+
+async function comDocumento<T>(
+  arquivo: File | Blob,
+  usar: (documento: PDFDocumentProxy) => Promise<T>,
+): Promise<T> {
+  // O arquivo é lido ANTES da fila: nenhuma espera pode acontecer entre
+  // apontar o trabalhador e abrir o documento, senão outra leitura se mete
+  // no meio e as duas passam a usar o mesmo trabalhador.
+  const dados = await arquivo.arrayBuffer()
   const { biblioteca, Trabalhador } = await carregarPdfjs()
 
-  // Porta em vez de endereço: o trabalhador vai embutido no pacote, então
-  // funciona igual no site hospedado e no arquivo único do artefato. Uma porta
-  // nova a cada leitura, porque encerrar a tarefa encerra o trabalhador junto.
-  biblioteca.GlobalWorkerOptions.workerPort = new Trabalhador()
+  return enfileirar(async () => {
+    biblioteca.GlobalWorkerOptions.workerPort = new Trabalhador()
+    const tarefa = biblioteca.getDocument({ data: dados })
+    try {
+      return await usar(await tarefa.promise)
+    } finally {
+      await tarefa.destroy()
+    }
+  })
+}
 
-  const tarefa = biblioteca.getDocument({ data: await arquivo.arrayBuffer() })
-
-  try {
-    const documento = await tarefa.promise
+export async function lerPdf(arquivo: File | Blob): Promise<LeituraPdf> {
+  return comDocumento(arquivo, async (documento) => {
     const quantasPaginas = documento.numPages
 
     const paginas: string[] = []
@@ -73,9 +102,54 @@ export async function lerPdf(arquivo: File | Blob): Promise<LeituraPdf> {
       // Umas poucas letras num documento inteiro quer dizer PDF de imagem.
       pareceDigitalizado: texto.replace(/\s/g, '').length < 20 * quantasPaginas,
     }
-  } finally {
-    await tarefa.destroy()
-  }
+  })
+}
+
+/**
+ * Desenha uma página do PDF como imagem.
+ *
+ * Serve para o caso do PDF escaneado, que não tem texto para extrair. Em vez de
+ * embutir um reconhecedor de imagem de vários megabytes — que ainda erra número,
+ * justo o que mais importa numa receita — a página vira imagem e quem lê é o
+ * próprio celular: no iPhone, segurar o dedo na imagem oferece copiar o texto.
+ */
+export async function desenharPagina(
+  arquivo: File | Blob,
+  numero: number,
+  larguraAlvo = 1400,
+): Promise<Blob> {
+  return comDocumento(arquivo, async (documento) => {
+    const pagina = await documento.getPage(numero)
+
+    const tamanhoNatural = pagina.getViewport({ scale: 1 })
+    // Escala generosa: reconhecimento de texto erra muito em imagem pequena.
+    const escala = Math.min(3, Math.max(1, larguraAlvo / tamanhoNatural.width))
+    const viewport = pagina.getViewport({ scale: escala })
+
+    const tela = document.createElement('canvas')
+    tela.width = Math.round(viewport.width)
+    tela.height = Math.round(viewport.height)
+    const contexto = tela.getContext('2d')
+    if (!contexto) throw new Error('Não consegui desenhar a página.')
+
+    // Fundo branco: PDF sem fundo vira imagem transparente, e aí o texto some.
+    contexto.fillStyle = '#ffffff'
+    contexto.fillRect(0, 0, tela.width, tela.height)
+
+    // "print" em vez de "display" de propósito: no modo de tela, o pdf.js avança
+    // o desenho por quadro de animação, que o navegador congela quando o app sai
+    // da frente. Como aqui a tela nem é mostrada — vira imagem — o modo de
+    // impressão termina o trabalho mesmo se ela trocar de app no meio.
+    await pagina.render({ canvas: tela, canvasContext: contexto, viewport, intent: 'print' })
+      .promise
+
+    return await new Promise<Blob>((resolve, reject) => {
+      tela.toBlob(
+        (blob) => (blob ? resolve(blob) : reject(new Error('Não consegui gerar a imagem.'))),
+        'image/png',
+      )
+    })
+  })
 }
 
 /**
