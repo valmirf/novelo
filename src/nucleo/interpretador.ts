@@ -43,6 +43,11 @@ export interface Carreira {
   /** Números que essa entrada cobre. "Carr 4-6" vira [4, 5, 6]. */
   numeros: number[]
   rotulo: string
+  /** Parte da receita a que pertence: "Aula 02", "Decote", "Mangas". */
+  secao?: string
+  /** "LD" (lado direito) ou "LA" (lado avesso), quando a receita diz. */
+  lado?: string
+  /** A linha como a receita escreveu. É o que vale quando não entendi o resto. */
   textoOriginal: string
   itens: Item[]
   /** Frase única com tudo expandido, para leitura rápida. */
@@ -50,6 +55,13 @@ export interface Carreira {
   consome: number
   produz: number
   totalDeclarado?: number
+  /**
+   * Só é verdadeiro quando a contagem foi mesmo apurada: todos os pontos
+   * reconhecidos e nenhuma instrução em aberto. Receita de tricô costuma dizer
+   * "M até o Marc 1", que não tem número nenhum — e aí a conta é um chute.
+   * Mostrar número inventado é pior do que não mostrar número.
+   */
+  contagemConfiavel: boolean
   /** Preenchido quando a conta não bate com o total que a receita declara. */
   divergencia?: string
   avisos: string[]
@@ -58,16 +70,31 @@ export interface Carreira {
 export interface Receita {
   carreiras: Carreira[]
   preambulo: string[]
+  /** Texto entre as carreiras: explicações, repetições de bloco, observações. */
+  recados: { depoisDaCarreira: number; texto: string }[]
+  /** Partes encontradas, na ordem: "Decote", "Cavas", "Mangas". */
+  secoes: string[]
   avisos: string[]
 }
 
 // --------------------------------------------------------------------------
 // Leitura das linhas
 
+// Aceita "Carr 3", "Carreiras 4 a 6", "Carr decote 1" e o "(LD)"/"(LA)" que as
+// receitas de tricô põem para dizer de que lado do trabalho a carreira é feita.
 const CABECALHO_NOMEADO =
-  /^\s*(?:carr?(?:eiras?)?|voltas?|fileiras?|rodadas?|rod)\s*\.?\s*(\d+)\s*(?:(?:[-–—]|\s+a\s+|\s+ate\s+)\s*(\d+))?\s*[:.)\-–—]?\s*(.*)$/i
+  /^\s*(?:carr?(?:eiras?)?|voltas?|fileiras?|rodadas?|rod)\s*\.?\s*([a-zà-ÿ]+\s+)?(\d+)\s*(?:(?:[-–—]|\s+a\s+|\s+ate\s+)\s*(\d+))?\s*(?:\(([^)]{1,24})\))?\s*[:.)\-–—]?\s*(.*)$/i
 
-const CABECALHO_NUMERICO = /^\s*(\d+)\s*(?:(?:[-–—]|\s+a\s+|\s+ate\s+)\s*(\d+))?\s*[:.)]\s*(.+)$/
+// Número solto só vira carreira com dois-pontos ou ponto final. Sem isso,
+// "218) pts" no meio de um parágrafo virava a "carreira 218".
+const CABECALHO_NUMERICO = /^\s*(\d+)\s*(?:(?:[-–—]|\s+a\s+|\s+ate\s+)\s*(\d+))?\s*[:.]\s*(.+)$/
+
+/** Corpo que é só uma unidade de medida não é carreira, é sobra de parágrafo. */
+const SO_UNIDADE = /^(?:pts?|pontos?|sts?|malhas?|carr?s?|cm|m)\b\s*[).]?\s*$/i
+
+/** Títulos de parte: a numeração das carreiras recomeça a cada um deles. */
+const TITULO_DE_SECAO =
+  /^(?:aula|parte|etapa|passo|bloco)\s*\d*\s*[-–—:]?\s*$|^(?:decote|cavas?|mangas?|gola|punhos?|corpo|costas|frente(?:\s+\w+)?|separa[cç][aã]o(?:\s+de\s+partes)?|acabamento|montagem|barra|capuz|bolsos?|listras em alto relevo|carreiras encurtadas)\b/i
 
 const TOTAIS = [
   /=\s*(\d+)\s*(?:pontos?|pts?|p|m|malhas?)?\s*$/i,
@@ -79,25 +106,45 @@ export function interpretar(texto: string): Receita {
   const linhas = texto.split(/\r?\n/)
   const carreiras: Carreira[] = []
   const preambulo: string[] = []
+  const recados: { depoisDaCarreira: number; texto: string }[] = []
   const avisos: string[] = []
 
   interface Bruta {
     numeros: number[]
     rotulo: string
+    /** "LD" (lado direito) ou "LA" (lado avesso), quando a receita diz. */
+    lado?: string
+    secao?: string
     corpo: string
   }
   const brutas: Bruta[] = []
+  let secaoAtual: string | undefined
 
   for (const linha of linhas) {
     const limpa = linha.trim()
     if (!limpa) continue
 
     const semAcento = limpa.normalize('NFD').replace(/[̀-ͯ]/g, '')
-    const achado = CABECALHO_NOMEADO.exec(semAcento) ?? CABECALHO_NUMERICO.exec(semAcento)
 
-    if (achado) {
-      const inicio = Number(achado[1])
-      const fim = achado[2] ? Number(achado[2]) : inicio
+    // Título de parte precisa ser testado antes: "Decote" não é carreira.
+    if (limpa.length <= 60 && TITULO_DE_SECAO.test(semAcento)) {
+      secaoAtual = limpa.replace(/[:\-–—\s]+$/, '')
+      continue
+    }
+
+    const nomeado = CABECALHO_NOMEADO.exec(semAcento)
+    const numerico = nomeado ? null : CABECALHO_NUMERICO.exec(semAcento)
+
+    // Os dois formatos têm grupos diferentes; aqui viram um formato só.
+    const cabecalho = nomeado
+      ? { qualificador: nomeado[1], inicio: nomeado[2], fim: nomeado[3], lado: nomeado[4], corpo: nomeado[5] }
+      : numerico
+        ? { qualificador: undefined, inicio: numerico[1], fim: numerico[2], lado: undefined, corpo: numerico[3] }
+        : null
+
+    if (cabecalho && !SO_UNIDADE.test(cabecalho.corpo)) {
+      const inicio = Number(cabecalho.inicio)
+      const fim = cabecalho.fim ? Number(cabecalho.fim) : inicio
       const numeros: number[] = []
       if (fim >= inicio && fim - inicio < 500) {
         for (let n = inicio; n <= fim; n++) numeros.push(n)
@@ -105,28 +152,39 @@ export function interpretar(texto: string): Receita {
         numeros.push(inicio)
         avisos.push(`Intervalo estranho na linha "${limpa}". Considerei só a carreira ${inicio}.`)
       }
+
+      const qualificador = cabecalho.qualificador?.trim()
+      const nomeBase = numeros.length > 1 ? `Carreiras ${inicio} a ${fim}` : `Carreira ${inicio}`
+
       // O corpo vem do texto original (com acentos), recortado no mesmo ponto.
-      const corpo = limpa.slice(limpa.length - achado[3].length)
+      const corpo = limpa.slice(limpa.length - cabecalho.corpo.length)
       brutas.push({
         numeros,
-        rotulo: numeros.length > 1 ? `Carreiras ${inicio} a ${fim}` : `Carreira ${inicio}`,
+        rotulo: qualificador ? `${nomeBase} do ${qualificador}` : nomeBase,
+        lado: cabecalho.lado?.trim().toUpperCase(),
+        secao: secaoAtual,
         corpo,
       })
     } else if (brutas.length === 0) {
       preambulo.push(limpa)
-    } else {
-      // Continuação da carreira anterior (receita quebrada em várias linhas).
+    } else if (ehContinuacao(brutas[brutas.length - 1].corpo, limpa)) {
       brutas[brutas.length - 1].corpo += ' ' + limpa
+    } else {
+      // Parágrafo entre carreiras: explicação, repetição de bloco, aviso de
+      // direitos autorais. Vira recado à parte — antes ia parar dentro da
+      // carreira anterior e virava instrução falsa.
+      recados.push({ depoisDaCarreira: brutas.length - 1, texto: limpa })
     }
   }
 
   let disponiveis = 0
   brutas.forEach((bruta, indice) => {
-    const carreira = montarCarreira(bruta.numeros, bruta.rotulo, bruta.corpo, indice, disponiveis)
+    const carreira = montarCarreira(bruta, indice, disponiveis)
     carreiras.push(carreira)
     // Carreiras repetidas ("Carr 4-6") mantêm a contagem estável a cada volta,
     // então o que alimenta a próxima é sempre o que a última volta produziu.
-    disponiveis = carreira.produz
+    // Se a contagem não é confiável, a corrente se perde e recomeça do zero.
+    disponiveis = carreira.contagemConfiavel ? carreira.produz : 0
   })
 
   if (carreiras.length === 0 && texto.trim()) {
@@ -135,17 +193,34 @@ export function interpretar(texto: string): Receita {
     )
   }
 
-  return { carreiras, preambulo, avisos }
+  const secoes = [...new Set(carreiras.map((c) => c.secao).filter((s): s is string => !!s))]
+
+  return { carreiras, preambulo, recados, secoes, avisos }
 }
 
+/**
+ * Decide se a linha é o resto da carreira anterior ou um parágrafo novo.
+ *
+ * Linha quebrada por largura da página continua em minúscula, ou vem logo depois
+ * de uma vírgula. Parágrafo novo começa com maiúscula depois de frase fechada.
+ */
+function ehContinuacao(corpoAnterior: string, linha: string): boolean {
+  const anterior = corpoAnterior.trimEnd()
+  const terminouAberto = /[,;(\-–—]$/.test(anterior) || !/[.!?:]$/.test(anterior)
+  const comecaEmMinuscula = /^[a-zà-ÿ(0-9]/.test(linha)
+  return terminouAberto && comecaEmMinuscula
+}
+
+/** Frases que dizem "vá até tal ponto" sem dizer quantos pontos são. */
+const ALVO_SEM_NUMERO = /\bate\s+(?:o\s+|a\s+|os\s+|as\s+)?(?:marc|marcador|faltar|o pt|o ponto|antes)/
+
 function montarCarreira(
-  numeros: number[],
-  rotulo: string,
-  corpoBruto: string,
+  bruta: { numeros: number[]; rotulo: string; lado?: string; secao?: string; corpo: string },
   indice: number,
   disponiveis: number,
 ): Carreira {
   const avisos: string[] = []
+  const corpoBruto = bruta.corpo
   let corpo = corpoBruto.trim()
   let totalDeclarado: number | undefined
 
@@ -166,29 +241,38 @@ function montarCarreira(
   const estado = { restantes: disponiveis, avisos }
   const { itens, consome, produz } = resolver(brutas, estado)
 
+  // A contagem só vale se eu entendi a carreira inteira. Duas coisas a derrubam:
+  // instrução que não reconheci, e alvo sem número ("M até o Marc 1").
+  const semAcento = corpo.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  const temAlvoSemNumero = ALVO_SEM_NUMERO.test(semAcento)
+  const temTrechoNaoLido = itens.some((item) => item.tipo === 'nota')
+  const contagemConfiavel =
+    itens.length > 0 && !temAlvoSemNumero && !temTrechoNaoLido && (disponiveis > 0 || consome === 0)
+
   let divergencia: string | undefined
-  if (totalDeclarado !== undefined && totalDeclarado !== produz) {
+  if (totalDeclarado !== undefined && contagemConfiavel && totalDeclarado !== produz) {
     divergencia =
       `A receita diz ${totalDeclarado} pontos, mas a conta dá ${produz}. ` +
       'Confira essa carreira antes de seguir.'
   }
 
-  if (disponiveis > 0 && consome > disponiveis) {
-    avisos.push(
-      `Essa carreira usa ${consome} pontos, mas a anterior deixou só ${disponiveis}.`,
-    )
+  if (contagemConfiavel && disponiveis > 0 && consome > disponiveis) {
+    avisos.push(`Essa carreira usa ${consome} pontos, mas a anterior deixou só ${disponiveis}.`)
   }
 
   return {
     indice,
-    numeros,
-    rotulo,
+    numeros: bruta.numeros,
+    rotulo: bruta.rotulo,
+    secao: bruta.secao,
+    lado: bruta.lado,
     textoOriginal: corpoBruto.trim(),
     itens,
     resumo: resumir(itens),
     consome,
     produz,
     totalDeclarado,
+    contagemConfiavel,
     divergencia,
     avisos,
   }

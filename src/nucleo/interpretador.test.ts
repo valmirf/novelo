@@ -97,6 +97,57 @@ describe('repetir até o fim', () => {
   })
 })
 
+// Receita de tricô profissional funciona de outro jeito: instrução relativa a
+// marcador, numeração que recomeça a cada parte, parágrafos de explicação no
+// meio. Nada disso tem contagem para apurar — e o app não pode fingir que tem.
+describe('receita de tricô com marcadores', () => {
+  const receita = interpretar(`
+Listras em Alto Relevo
+Carr 1 (LD): Desl 1 T, M
+Carr 2 (LA): Desl 1 T, M
+Carr 3 (LD): Desl 1 T, M até o Marc 1, T até o Marc 4, M até o fim da carr
+Trabalhar as Carr 1 e 2 mais 3 vezes no total.
+Decote
+Carr 1 (LD): M até faltar 3 pts, 2jm, 1 M
+`)
+
+  it('não inventa contagem quando a instrução não tem número', () => {
+    expect(receita.carreiras.every((c) => c.contagemConfiavel === false)).toBe(true)
+  })
+
+  it('guarda o texto da receita para mostrar no lugar da paráfrase', () => {
+    expect(receita.carreiras[2].textoOriginal).toBe(
+      'Desl 1 T, M até o Marc 1, T até o Marc 4, M até o fim da carr',
+    )
+  })
+
+  it('separa as partes e deixa a numeração recomeçar', () => {
+    expect(receita.secoes).toEqual(['Listras em Alto Relevo', 'Decote'])
+    expect(receita.carreiras.at(-1)?.secao).toBe('Decote')
+    expect(receita.carreiras.at(-1)?.numeros).toEqual([1])
+  })
+
+  it('lê o lado do trabalho', () => {
+    expect(receita.carreiras[0].lado).toBe('LD')
+    expect(receita.carreiras[1].lado).toBe('LA')
+  })
+
+  it('põe parágrafo de explicação como recado, não dentro da carreira', () => {
+    expect(receita.recados.map((r) => r.texto)).toContain(
+      'Trabalhar as Carr 1 e 2 mais 3 vezes no total.',
+    )
+    expect(receita.carreiras[2].textoOriginal).not.toContain('Trabalhar')
+  })
+})
+
+describe('não confunde número solto com carreira', () => {
+  it('ignora contagem de pontos escrita como "218) pts"', () => {
+    const receita = interpretar('Montagem\n218) pts\nCarr 1: Meia')
+    expect(receita.carreiras).toHaveLength(1)
+    expect(receita.carreiras[0].numeros).toEqual([1])
+  })
+})
+
 describe('tolerância a texto solto', () => {
   it('guarda o que vem antes da primeira carreira', () => {
     const receita = interpretar('Touca de bebê\nUse agulha 3,5mm\nCarr 1: 6 pb no anel mágico')

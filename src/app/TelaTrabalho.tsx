@@ -171,6 +171,14 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
 
   const grupoDaCarreira = atual?.carreira.itens.find((item) => item.tipo === 'grupo')
 
+  // Recados aparecem depois da última linha da carreira a que pertencem.
+  const recadosAqui =
+    atual && atual.volta === atual.totalVoltas
+      ? leitura.recados
+          .filter((recado) => recado.depoisDaCarreira === atual.carreira.indice)
+          .map((recado) => recado.texto)
+      : []
+
   return (
     <div className="trabalho">
       <header className="cabecalho">
@@ -211,12 +219,25 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
           <>
             <div className="carreira-atual">
               <div className="rotulo">
-                Carreira {atual.numero} de {linhas[linhas.length - 1].numero}
+                {atual.carreira.secao && <>{atual.carreira.secao} · </>}
+                {atual.carreira.rotulo}
+                {atual.carreira.lado && ` (${atual.carreira.lado})`}
                 {atual.totalVoltas > 1 && ` · ${atual.volta}ª vez de ${atual.totalVoltas}`}
               </div>
-              <div className="instrucao">{atual.carreira.resumo}</div>
 
-              {atual.carreira.itens.length > 1 && (
+              {/*
+                Quando a contagem foi mesmo apurada, a versão expandida ajuda:
+                "(1 pb, 1 aum) x6" vira uma frase. Quando não foi — receita de
+                tricô que manda "M até o Marc 1" — o texto da receita é melhor do
+                que qualquer paráfrase minha, e não corre risco de dizer bobagem.
+              */}
+              <div className="instrucao">
+                {atual.carreira.contagemConfiavel
+                  ? atual.carreira.resumo
+                  : atual.carreira.textoOriginal}
+              </div>
+
+              {atual.carreira.contagemConfiavel && atual.carreira.itens.length > 1 && (
                 <ul className="passos">
                   {atual.carreira.itens.map((item, indice) => (
                     <li
@@ -229,9 +250,18 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
                 </ul>
               )}
 
-              <p className="suave" style={{ marginTop: '0.8rem', marginBottom: 0 }}>
-                Ao terminar, você deve ter <strong>{atual.carreira.produz} pontos</strong>.
-              </p>
+              {atual.carreira.contagemConfiavel ? (
+                <p className="suave" style={{ marginTop: '0.8rem', marginBottom: 0 }}>
+                  Ao terminar, você deve ter <strong>{atual.carreira.produz} pontos</strong>.
+                </p>
+              ) : (
+                atual.carreira.totalDeclarado !== undefined && (
+                  <p className="suave" style={{ marginTop: '0.8rem', marginBottom: 0 }}>
+                    A receita diz que aqui você deve ter{' '}
+                    <strong>{atual.carreira.totalDeclarado} pontos</strong>.
+                  </p>
+                )
+              )}
             </div>
 
             {atual.carreira.divergencia && (
@@ -241,9 +271,19 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
               <Aviso key={indice}>{aviso}</Aviso>
             ))}
 
+            {/* Parágrafos que vêm entre as carreiras: repetir bloco, trocar cor. */}
+            {recadosAqui.map((recado, indice) => (
+              <div key={indice} className="carreira-proxima">
+                {recado}
+              </div>
+            ))}
+
             {proxima && (
               <div className="carreira-proxima">
-                <strong>Depois vem:</strong> {proxima.carreira.resumo}
+                <strong>Depois vem:</strong>{' '}
+                {proxima.carreira.contagemConfiavel
+                  ? proxima.carreira.resumo
+                  : proxima.carreira.textoOriginal}
               </div>
             )}
           </>

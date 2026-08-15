@@ -103,6 +103,12 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
   // mas seis carreiras para tricotar, e é esse número que faz sentido para ela.
   const quantasCarreiras = leitura.carreiras.reduce((soma, c) => soma + c.numeros.length, 0)
 
+  /** Quantas dessas carreiras eu realmente consegui conferir a conta. */
+  const conferidas = leitura.carreiras.reduce(
+    (soma, c) => soma + (c.contagemConfiavel ? c.numeros.length : 0),
+    0,
+  )
+
   const escolherArquivo = async (arquivo: File | undefined) => {
     if (entradaPdf.current) entradaPdf.current.value = ''
     if (!arquivo) return
@@ -267,18 +273,41 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
       {(receita.texto ?? '').trim().length > 0 && (
         <div className="cartao">
           <h2>Conferência</h2>
-          <p className="suave">O app leu a receita e conferiu as contas para você.</p>
 
           {leitura.avisos.map((aviso, indice) => (
             <Aviso key={indice}>{aviso}</Aviso>
           ))}
 
-          {leitura.carreiras.length > 0 && comProblema.length === 0 && (
-            <Aviso tipo="tudo-certo">
-              {quantasCarreiras === 1
-                ? 'Entendi 1 carreira e as contas batem.'
-                : `Entendi ${quantasCarreiras} carreiras e as contas batem.`}
-            </Aviso>
+          {leitura.carreiras.length > 0 && (
+            <>
+              <Aviso tipo={conferidas > 0 && comProblema.length === 0 ? 'tudo-certo' : 'atencao'}>
+                {conferidas === 0 ? (
+                  <>
+                    Separei {quantasCarreiras}{' '}
+                    {quantasCarreiras === 1 ? 'carreira' : 'carreiras'}, mas não consigo conferir as
+                    contas desta receita: ela manda coisas como “até o marcador”, que não têm um
+                    número fixo. Vou te mostrar a receita como ela está escrita e contar as carreiras
+                    — sem inventar número.
+                  </>
+                ) : conferidas === quantasCarreiras && comProblema.length === 0 ? (
+                  <>
+                    Entendi {quantasCarreiras} {quantasCarreiras === 1 ? 'carreira' : 'carreiras'} e
+                    as contas batem.
+                  </>
+                ) : (
+                  <>
+                    Separei {quantasCarreiras} carreiras e consegui conferir a conta de {conferidas}.
+                    Nas outras vou mostrar o texto da receita do jeito que está.
+                  </>
+                )}
+              </Aviso>
+
+              {leitura.secoes.length > 0 && (
+                <p className="suave">
+                  Partes encontradas: {leitura.secoes.join(', ')}.
+                </p>
+              )}
+            </>
           )}
 
           {comProblema.map((carreira) => (
@@ -289,8 +318,11 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
 
           {leitura.carreiras.slice(0, 3).map((carreira) => (
             <div key={carreira.indice} className="passo" style={{ marginBottom: '0.4rem' }}>
-              <strong>{carreira.rotulo}:</strong> {carreira.resumo}
-              <div className="suave">Termina com {carreira.produz} pontos</div>
+              <strong>{carreira.rotulo}:</strong>{' '}
+              {carreira.contagemConfiavel ? carreira.resumo : carreira.textoOriginal}
+              {carreira.contagemConfiavel && (
+                <div className="suave">Termina com {carreira.produz} pontos</div>
+              )}
             </div>
           ))}
           {leitura.carreiras.length > 3 && (
