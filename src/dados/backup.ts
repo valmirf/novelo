@@ -68,33 +68,10 @@ export async function gerarBackup(): Promise<ArquivoBackup> {
   }
 }
 
-export type ResultadoDownload = 'salvo' | 'recusado'
-
-/**
- * Entrega o arquivo de cópia para a pessoa guardar.
- *
- * São dois caminhos porque são dois lugares onde o app roda. No navegador comum
- * vale o link de download de sempre. Já quando o Novelo está publicado como
- * página no claude.ai, links de download não funcionam — lá é preciso pedir ao
- * hospedeiro, que mostra uma confirmação e pode ser recusado.
- */
-export async function baixarBackup(dados: ArquivoBackup): Promise<ResultadoDownload> {
-  const data = new Date().toISOString().slice(0, 10)
-  const nome = `novelo-backup-${data}.json`
-  const conteudo = JSON.stringify(dados)
-
-  const salvador = await acharSalvador()
-  if (salvador) {
-    try {
-      await salvador.save({ filename: nome, data: conteudo })
-      return 'salvo'
-    } catch (problema) {
-      if ((problema as { code?: string })?.code === 'declined') return 'recusado'
-      throw problema
-    }
-  }
-
-  const url = URL.createObjectURL(new Blob([conteudo], { type: 'application/json' }))
+/** Baixa a cópia como arquivo. Funciona em navegador comum. */
+export function baixarBackup(dados: ArquivoBackup): void {
+  const nome = `novelo-backup-${new Date().toISOString().slice(0, 10)}.json`
+  const url = URL.createObjectURL(new Blob([JSON.stringify(dados)], { type: 'application/json' }))
   const link = document.createElement('a')
   link.href = url
   link.download = nome
@@ -102,23 +79,27 @@ export async function baixarBackup(dados: ArquivoBackup): Promise<ResultadoDownl
   link.click()
   link.remove()
   setTimeout(() => URL.revokeObjectURL(url), 1000)
-  return 'salvo'
 }
 
-interface SalvadorDeArquivo {
-  save(pedido: { filename: string; data: string }): Promise<{ status: 'saved' }>
-}
-
-async function acharSalvador(): Promise<SalvadorDeArquivo | null> {
-  const janela = window as unknown as {
-    claude?: { use?: (nome: string) => Promise<unknown> }
-  }
-  if (!janela.claude?.use) return null
+/**
+ * A cópia como texto, para quando o download não funciona.
+ *
+ * Existe porque nem todo lugar onde o app roda deixa a página entregar arquivo:
+ * dentro de uma página incorporada o botão de baixar não faz nada. Aí o jeito é
+ * copiar o texto e colar num e-mail para si mesma.
+ */
+export async function copiarBackup(dados: ArquivoBackup): Promise<'copiado' | 'copie-na-mao'> {
+  const texto = JSON.stringify(dados)
   try {
-    return ((await janela.claude.use('downloads')) as SalvadorDeArquivo | null) ?? null
+    await navigator.clipboard.writeText(texto)
+    return 'copiado'
   } catch {
-    return null
+    return 'copie-na-mao'
   }
+}
+
+export function backupComoTexto(dados: ArquivoBackup): string {
+  return JSON.stringify(dados)
 }
 
 export interface ResultadoImportacao {

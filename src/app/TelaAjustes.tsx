@@ -1,6 +1,13 @@
 import { useRef, useState } from 'react'
 import { repositorio, useAgulhas, useLinhas, useAjustes, useProjetos, useReceitas } from '../dados/repositorio'
-import { baixarBackup, gerarBackup, importarBackup, type ResultadoImportacao } from '../dados/backup'
+import {
+  backupComoTexto,
+  baixarBackup,
+  copiarBackup,
+  gerarBackup,
+  importarBackup,
+  type ResultadoImportacao,
+} from '../dados/backup'
 import { converterAmostra } from '../nucleo/amostra'
 import { VOZ_DISPONIVEL } from './ganchos'
 import { Aviso, Cabecalho, Campo, Escolha, Interruptor } from './ui'
@@ -16,13 +23,40 @@ export function TelaAjustes() {
   const [ocupado, setOcupado] = useState(false)
   const [resultado, setResultado] = useState<ResultadoImportacao>()
   const [erro, setErro] = useState<string>()
+  const [recado, setRecado] = useState<string>()
+  const [textoDaCopia, setTextoDaCopia] = useState<string>()
+  const [textoColado, setTextoColado] = useState('')
+
+  const limpar = () => {
+    setErro(undefined)
+    setRecado(undefined)
+    setResultado(undefined)
+  }
 
   const exportar = async () => {
     setOcupado(true)
-    setErro(undefined)
+    limpar()
     try {
-      if ((await baixarBackup(await gerarBackup())) === 'recusado') {
-        setErro('A cópia não foi salva. Toque de novo e confirme para guardar o arquivo.')
+      baixarBackup(await gerarBackup())
+      setRecado('Cópia baixada. Se não apareceu nenhum arquivo, use o botão de copiar abaixo.')
+    } catch {
+      setErro('Não consegui gerar a cópia. Tente de novo.')
+    } finally {
+      setOcupado(false)
+    }
+  }
+
+  const copiar = async () => {
+    setOcupado(true)
+    limpar()
+    try {
+      const dados = await gerarBackup()
+      if ((await copiarBackup(dados)) === 'copiado') {
+        setRecado('Cópia copiada. Agora cole num e-mail para você mesma e envie.')
+        setTextoDaCopia(undefined)
+      } else {
+        setTextoDaCopia(backupComoTexto(dados))
+        setRecado('Selecione todo o texto abaixo, copie e cole num e-mail para você mesma.')
       }
     } catch {
       setErro('Não consegui gerar a cópia. Tente de novo.')
@@ -31,19 +65,25 @@ export function TelaAjustes() {
     }
   }
 
-  const importar = async (arquivo: File | undefined) => {
-    if (!arquivo) return
+  const restaurar = async (texto: string, aoTerminar?: () => void) => {
     setOcupado(true)
-    setErro(undefined)
-    setResultado(undefined)
+    limpar()
     try {
-      setResultado(await importarBackup(await arquivo.text()))
+      setResultado(await importarBackup(texto))
+      setTextoColado('')
     } catch (problema) {
-      setErro(problema instanceof Error ? problema.message : 'Não consegui ler esse arquivo.')
+      setErro(problema instanceof Error ? problema.message : 'Não consegui ler essa cópia.')
     } finally {
       setOcupado(false)
-      if (entradaArquivo.current) entradaArquivo.current.value = ''
+      aoTerminar?.()
     }
+  }
+
+  const importarArquivo = async (arquivo: File | undefined) => {
+    if (!arquivo) return
+    await restaurar(await arquivo.text(), () => {
+      if (entradaArquivo.current) entradaArquivo.current.value = ''
+    })
   }
 
   return (
@@ -118,15 +158,44 @@ export function TelaAjustes() {
           disabled={ocupado}
           onClick={() => void exportar()}
         >
-          {ocupado ? 'Preparando…' : 'Fazer cópia de segurança'}
+          {ocupado ? 'Preparando…' : 'Baixar a cópia'}
         </button>
+
+        <button
+          className="botao contorno largo"
+          style={{ marginTop: '0.7rem' }}
+          disabled={ocupado}
+          onClick={() => void copiar()}
+        >
+          Copiar a cópia para colar num e-mail
+        </button>
+
+        {textoDaCopia && (
+          <textarea
+            readOnly
+            value={textoDaCopia}
+            onFocus={(evento) => evento.currentTarget.select()}
+            style={{
+              width: '100%',
+              minHeight: '8rem',
+              marginTop: '0.7rem',
+              padding: '0.6rem',
+              border: '2px solid var(--borda-forte)',
+              borderRadius: '0.7rem',
+              background: 'var(--superficie)',
+              color: 'var(--texto)',
+              fontFamily: 'inherit',
+              fontSize: '0.8rem',
+            }}
+          />
+        )}
 
         <input
           ref={entradaArquivo}
           type="file"
           accept="application/json,.json"
           hidden
-          onChange={(evento) => void importar(evento.target.files?.[0])}
+          onChange={(evento) => void importarArquivo(evento.target.files?.[0])}
         />
         <button
           className="botao contorno largo"
@@ -134,9 +203,30 @@ export function TelaAjustes() {
           disabled={ocupado}
           onClick={() => entradaArquivo.current?.click()}
         >
-          Restaurar de uma cópia
+          Restaurar de um arquivo
         </button>
 
+        <div style={{ marginTop: '1.2rem' }}>
+          <Campo
+            rotulo="Ou cole aqui o texto de uma cópia"
+            ajuda="Se você guardou a cópia num e-mail, copie o texto de lá e cole aqui"
+          >
+            <textarea
+              style={{ minHeight: '6rem', fontSize: '0.8rem' }}
+              value={textoColado}
+              onChange={(evento) => setTextoColado(evento.target.value)}
+            />
+          </Campo>
+          <button
+            className="botao contorno largo"
+            disabled={ocupado || !textoColado.trim()}
+            onClick={() => void restaurar(textoColado)}
+          >
+            Restaurar do texto colado
+          </button>
+        </div>
+
+        {recado && <div style={{ marginTop: '0.8rem' }}><Aviso>{recado}</Aviso></div>}
         {erro && <div style={{ marginTop: '0.8rem' }}><Aviso tipo="problema">{erro}</Aviso></div>}
 
         {resultado && (
