@@ -8,6 +8,11 @@
 // Só tipo: some na compilação, então não puxa o pdf.js para o pacote principal.
 import type { PDFDocumentProxy } from 'pdfjs-dist'
 
+// A build "moderna" do pdf.js usa a leitura por stream (ReadableStream.values),
+// que o Safari não suporta direito — quebra com "undefined is not a function"
+// bem no meio da leitura, e é exatamente onde o iPhone da Camila trava, porque
+// lá só existe Safari. A build "legacy" evita essa API e funciona em todo lugar.
+
 /**
  * Descobre o que é o arquivo olhando o conteúdo, não o nome.
  *
@@ -61,15 +66,15 @@ interface ItemDeTexto {
  */
 let pdfjsCarregado:
   | Promise<{
-      biblioteca: typeof import('pdfjs-dist')
+      biblioteca: typeof import('pdfjs-dist/legacy/build/pdf.mjs')
       Trabalhador: new () => Worker
     }>
   | undefined
 
 function carregarPdfjs() {
   pdfjsCarregado ??= Promise.all([
-    import('pdfjs-dist'),
-    import('pdfjs-dist/build/pdf.worker.min.mjs?worker&inline'),
+    import('pdfjs-dist/legacy/build/pdf.mjs'),
+    import('pdfjs-dist/legacy/build/pdf.worker.min.mjs?worker&inline'),
   ]).then(([biblioteca, modulo]) => ({ biblioteca, Trabalhador: modulo.default }))
   return pdfjsCarregado
 }
