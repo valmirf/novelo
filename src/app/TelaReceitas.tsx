@@ -27,6 +27,9 @@ export function TelaReceitas({ navegacao }: { navegacao: Navegacao }) {
       <button className="botao principal largo gigante" onClick={() => navegacao.ir({ tela: 'receita' })}>
         <span aria-hidden="true">＋</span> Guardar uma receita nova
       </button>
+      <p className="suave" style={{ marginTop: '0.5rem' }}>
+        Você pode trazer de um arquivo PDF ou escrever à mão.
+      </p>
 
       {receitas.length > 3 && (
         <div style={{ marginTop: '1rem' }}>
@@ -46,7 +49,7 @@ export function TelaReceitas({ navegacao }: { navegacao: Navegacao }) {
           <Vazio
             desenho="📖"
             titulo="Nenhuma receita ainda"
-            texto="Guarde aqui as receitas que você usa. Pode copiar de um site, digitar do caderno ou escrever do seu jeito."
+            texto="Guarde aqui as receitas que você usa. Pode trazer de um arquivo PDF, copiar de um site ou digitar do caderno."
           />
         ) : filtradas.length === 0 ? (
           <Vazio desenho="🔎" titulo="Nada encontrado" texto="Nenhuma receita com esse nome." />
@@ -168,6 +171,39 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
     <>
       <Cabecalho titulo={id ? 'Editar receita' : 'Receita nova'} aoVoltar={navegacao.voltar} />
 
+      {/*
+        A entrada por PDF vem antes de tudo de propósito: é assim que a maior
+        parte das receitas chega, e escondida lá embaixo ninguém achava.
+      */}
+      <input
+        ref={entradaPdf}
+        type="file"
+        accept="application/pdf,.pdf"
+        hidden
+        onChange={(evento) => void escolherPdf(evento.target.files?.[0])}
+      />
+      <button
+        type="button"
+        className="botao principal largo gigante"
+        disabled={lendoPdf}
+        onClick={() => entradaPdf.current?.click()}
+      >
+        {lendoPdf ? 'Lendo o PDF…' : '📄 Tenho a receita em PDF'}
+      </button>
+      <p className="suave" style={{ marginTop: '0.5rem', marginBottom: '1.4rem' }}>
+        Escolha o arquivo e eu trago a receita escrita para você. Ou preencha à mão abaixo.
+      </p>
+
+      {avisoPdf && <Aviso tipo={avisoPdf.tipo}>{avisoPdf.texto}</Aviso>}
+
+      {pdfEscaneado && (
+        <PdfEscaneado
+          arquivo={pdfEscaneado.arquivo}
+          paginas={pdfEscaneado.paginas}
+          aoFechar={() => setPdfEscaneado(undefined)}
+        />
+      )}
+
       <Campo rotulo="Nome da peça" ajuda="Por exemplo: Touca da Ana, Manta cinza">
         <input
           type="text"
@@ -191,33 +227,6 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
         fotoId={receita.fotoId}
         aoTrocar={(fotoId) => mudar({ fotoId })}
       />
-
-      <input
-        ref={entradaPdf}
-        type="file"
-        accept="application/pdf,.pdf"
-        hidden
-        onChange={(evento) => void escolherPdf(evento.target.files?.[0])}
-      />
-      <button
-        type="button"
-        className="botao contorno largo"
-        style={{ marginBottom: '1.1rem' }}
-        disabled={lendoPdf}
-        onClick={() => entradaPdf.current?.click()}
-      >
-        {lendoPdf ? 'Lendo o PDF…' : 'Trazer a receita de um PDF'}
-      </button>
-
-      {avisoPdf && <Aviso tipo={avisoPdf.tipo}>{avisoPdf.texto}</Aviso>}
-
-      {pdfEscaneado && (
-        <PdfEscaneado
-          arquivo={pdfEscaneado.arquivo}
-          paginas={pdfEscaneado.paginas}
-          aoFechar={() => setPdfEscaneado(undefined)}
-        />
-      )}
 
       <Campo rotulo="A receita" ajuda="Uma carreira por linha, começando por “Carreira 1:”">
         <textarea
