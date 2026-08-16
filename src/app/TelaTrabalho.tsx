@@ -68,24 +68,32 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
     await repositorio.projetos.salvar({ ...base, ...mudancas })
   }, [])
 
-  /** Fecha a sessão de cronômetro em aberto e soma no total do trabalho. */
-  const registrarSessao = useCallback(
-    async (segundos: number) => {
-      const base = projetoRef.current
-      if (!base || segundos < 5) return
-      const fim = new Date()
-      const inicio = new Date(fim.getTime() - segundos * 1000)
-      await repositorio.projetos.salvar({
-        ...base,
-        segundosTotais: base.segundosTotais + segundos,
-        sessoes: [
-          ...base.sessoes,
-          { inicio: inicio.toISOString(), fim: fim.toISOString(), segundos },
-        ],
-      })
-    },
-    [],
-  )
+  // Quanto tempo o projeto já tinha ANTES desta sessão de trabalho começar.
+  // Fica fixo do início ao fim da visita à tela — mesmo que o total no banco
+  // suba por causa dos retoques periódicos abaixo, a conta aqui não se mistura
+  // com eles. Só é capturado quando o projeto chega (useLiveQuery é assíncrono).
+  const linhaDeBase = useRef<number>()
+  if (linhaDeBase.current === undefined && projeto) linhaDeBase.current = projeto.segundosTotais
+
+  /**
+   * Fecha a sessão de cronômetro em aberto e soma no total do trabalho.
+   *
+   * Escrito de forma absoluta (base fixa + tempo corrido), não como "some mais
+   * isto" — assim, mesmo que o retoque periódico já tenha escrito um valor
+   * parecido um instante atrás, gravar de novo aqui não soma em dobro.
+   */
+  const registrarSessao = useCallback(async (segundos: number) => {
+    const base = projetoRef.current
+    if (!base || linhaDeBase.current === undefined || segundos < 5) return
+    const fim = new Date()
+    const inicio = new Date(fim.getTime() - segundos * 1000)
+    await repositorio.projetos.salvar({
+      ...base,
+      segundosTotais: linhaDeBase.current + segundos,
+      sessoes: [...base.sessoes, { inicio: inicio.toISOString(), fim: fim.toISOString(), segundos }],
+    })
+    linhaDeBase.current += segundos
+  }, [])
 
   // As funções do cronômetro trocam de identidade a cada segundo; guardar em
   // referência evita que os efeitos abaixo re-disparem sem parar.
@@ -98,6 +106,29 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
   // O cronômetro começa sozinho: ela abriu a tela para trabalhar.
   useEffect(() => {
     comandos.current.comecar()
+  }, [])
+
+  /**
+   * Retoca o tempo salvo a cada meio minuto, enquanto ela trabalha.
+   *
+   * Descobri testando que 'pagehide' e outros avisos de saída NÃO bastam:
+   * eles disparam a gravação, mas a gravação é assíncrona (grava no banco do
+   * aparelho) e o navegador não promete terminar esse tipo de gravação antes
+   * de fechar a página — testei fechando de propósito bem na hora e o tempo se
+   * perdeu mesmo com o aviso escutado. A defesa de verdade é nunca deixar
+   * passar muito tempo sem já ter salvo: o pior caso vira "perde os últimos
+   * 30 segundos", não "perde a sessão inteira".
+   */
+  useEffect(() => {
+    const retocar = () => {
+      const base = projetoRef.current
+      if (!base || !comandos.current.rodando || linhaDeBase.current === undefined) return
+      const segundos = comandos.current.segundos
+      if (segundos < 5) return
+      void repositorio.projetos.salvar({ ...base, segundosTotais: linhaDeBase.current + segundos })
+    }
+    const id = setInterval(retocar, 30_000)
+    return () => clearInterval(id)
   }, [])
 
   // Sai da frente, pausa e guarda o tempo; volta para a frente, retoma sozinho.
@@ -454,7 +485,12 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
           <div style={{ textAlign: 'right' }}>
             <div className="suave">No total</div>
             <div style={{ fontWeight: 700 }}>
-              {formatarDuracao(projeto.segundosTotais + cronometro.segundos)}
+              {/*
+                Usa a base fixa do início da visita, não o projeto.segundosTotais
+                ao vivo: o retoque periódico já escreve nele por baixo dos panos,
+                e somar cronometro.segundos por cima de novo contaria em dobro.
+              */}
+              {formatarDuracao((linhaDeBase.current ?? projeto.segundosTotais) + cronometro.segundos)}
             </div>
           </div>
           <button

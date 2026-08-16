@@ -219,13 +219,23 @@ export function TelaProjetoEditor({
         aoTrocar={(fotoId) => mudar({ fotoId })}
       />
 
-      {linhas.length > 0 && (
-        <div className="campo">
-          <span>
-            Linhas usadas
-            <br />
-            <span className="ajuda">Toque para marcar as que estão nesse trabalho</span>
+      {/*
+        Antes estas duas seções simplesmente não apareciam quando o inventário
+        estava vazio — e aí não havia como descobrir que dava para marcar linha
+        e agulha no trabalho. Agora a seção aparece sempre, e quando não há o
+        que marcar ela diz onde cadastrar e leva até lá.
+      */}
+      <div className="campo">
+        <span>
+          Linhas usadas
+          <br />
+          <span className="ajuda">
+            {linhas.length > 0
+              ? 'Toque para marcar as que estão nesse trabalho'
+              : 'Você ainda não guardou nenhuma linha'}
           </span>
+        </span>
+        {linhas.length > 0 ? (
           <div className="opcoes" style={{ flexDirection: 'column' }}>
             {linhas.map((linha) => (
               <button
@@ -240,12 +250,28 @@ export function TelaProjetoEditor({
               </button>
             ))}
           </div>
-        </div>
-      )}
+        ) : (
+          <button
+            type="button"
+            className="botao contorno largo"
+            onClick={() => navegacao.ir({ tela: 'linha' })}
+          >
+            Guardar uma linha
+          </button>
+        )}
+      </div>
 
-      {agulhas.length > 0 && (
-        <div className="campo">
-          <span>Agulhas usadas</span>
+      <div className="campo">
+        <span>
+          Agulhas usadas
+          <br />
+          <span className="ajuda">
+            {agulhas.length > 0
+              ? 'Toque para marcar as que estão nesse trabalho'
+              : 'Você ainda não guardou nenhuma agulha'}
+          </span>
+        </span>
+        {agulhas.length > 0 ? (
           <div className="opcoes" style={{ flexDirection: 'column' }}>
             {agulhas.map((agulha) => (
               <button
@@ -260,8 +286,16 @@ export function TelaProjetoEditor({
               </button>
             ))}
           </div>
-        </div>
-      )}
+        ) : (
+          <button
+            type="button"
+            className="botao contorno largo"
+            onClick={() => navegacao.ir({ tela: 'agulha' })}
+          >
+            Guardar uma agulha
+          </button>
+        )}
+      </div>
 
       <div className="campo-duplo">
         <Campo rotulo="Minha amostra: pontos em 10 cm">
@@ -310,6 +344,12 @@ export function TelaProjetoEditor({
           <p style={{ fontSize: '1.3rem', fontWeight: 700 }}>
             {formatarDuracao(projeto.segundosTotais ?? 0)} no total
           </p>
+          {projeto.status === 'finalizado' && (
+            <p className="suave">
+              Marcar como pronto não apaga nada: o tempo, as carreiras, a linha e a agulha ficam
+              guardados aqui como registro da peça.
+            </p>
+          )}
           {(projeto.sessoes ?? [])
             .slice(-6)
             .reverse()
