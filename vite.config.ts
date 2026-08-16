@@ -9,7 +9,11 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // 'prompt': a versão nova baixa e fica esperando; quem decide a hora de
+      // trocar é a pessoa, tocando em "Atualizar agora" (AvisoAtualizacao.tsx).
+      // 'autoUpdate' recarregaria a tela sozinho, o que apagaria o que ela
+      // estivesse digitando numa receita sem avisar.
+      registerType: 'prompt',
       includeAssets: ['icone.svg'],
       manifest: {
         name: 'Novelo — tricô e crochê',
@@ -30,6 +34,11 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // Sem skipWaiting: a versão nova baixa e fica esperando o toque em
+        // "Atualizar agora" — é o botão que manda o aviso pra ela assumir.
+        // clientsClaim garante que, assim que ela assumir, controla a aba na
+        // hora, sem precisar de um segundo recarregamento.
+        clientsClaim: true,
       },
     }),
   ],

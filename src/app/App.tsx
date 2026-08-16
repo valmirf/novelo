@@ -5,6 +5,7 @@ import { TelaReceitas, TelaReceitaEditor } from './TelaReceitas'
 import { TelaMateriais, TelaLinhaEditor, TelaAgulhaEditor } from './TelaMateriais'
 import { TelaTrabalho } from './TelaTrabalho'
 import { TelaAjustes } from './TelaAjustes'
+import { AvisoAtualizacao, useAtualizacaoDisponivel } from './AvisoAtualizacao'
 
 export type Rota =
   | { tela: 'projetos' }
@@ -59,14 +60,21 @@ export function App() {
   }, [])
 
   const navegacao: Navegacao = { ir, voltar }
+  const atualizacao = useAtualizacaoDisponivel()
 
   // O modo trabalho toma a tela inteira: nada de aba embaixo tirando espaço.
   if (atual.tela === 'trabalho') {
-    return <TelaTrabalho projetoId={atual.id} navegacao={navegacao} />
+    return (
+      <>
+        <TelaTrabalho projetoId={atual.id} navegacao={navegacao} />
+        {atualizacao.disponivel && <AvisoAtualizacao atualizar={atualizacao.atualizar} />}
+      </>
+    )
   }
 
   return (
     <div className="aplicativo">
+      {atualizacao.disponivel && <AvisoAtualizacao atualizar={atualizacao.atualizar} />}
       <main className="conteudo">
         {atual.tela === 'projetos' && <TelaProjetos navegacao={navegacao} />}
         {atual.tela === 'receitas' && <TelaReceitas navegacao={navegacao} />}
