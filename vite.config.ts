@@ -2,7 +2,15 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// Carimbo da versão publicada. Serve para saber, olhando a tela do aparelho da
+// pessoa, se ela está mesmo na versão nova ou numa cópia velha presa no cache —
+// pergunta que já custou vários dias de investigação às cegas.
+const versao = new Date().toISOString().slice(0, 16).replace('T', ' ')
+
 export default defineConfig({
+  define: {
+    __VERSAO_DO_APP__: JSON.stringify(versao),
+  },
   // Endereços relativos: assim o app funciona tanto na raiz do domínio quanto
   // numa subpasta, que é como o GitHub Pages publica.
   base: './',

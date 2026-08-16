@@ -9,6 +9,7 @@ import {
   type ResultadoImportacao,
 } from '../dados/backup'
 import { converterAmostra } from '../nucleo/amostra'
+import { VERSAO } from '../nucleo/diagnostico'
 import { VOZ_DISPONIVEL } from './ganchos'
 import { Aviso, Cabecalho, Campo, Escolha, Interruptor } from './ui'
 
@@ -26,6 +27,33 @@ export function TelaAjustes() {
   const [recado, setRecado] = useState<string>()
   const [textoDaCopia, setTextoDaCopia] = useState<string>()
   const [textoColado, setTextoColado] = useState('')
+  const [buscandoVersao, setBuscandoVersao] = useState(false)
+
+  /**
+   * Joga fora a cópia guardada no aparelho e baixa tudo de novo.
+   *
+   * Existe porque a cópia offline pode ficar presa numa versão antiga, e a
+   * saída conhecida — "recarregar forçado" — não é algo que se possa pedir a
+   * quem não mexe com navegador. As receitas ficam no banco do aparelho, que
+   * não é tocado aqui; só os arquivos do app são baixados de novo.
+   */
+  const buscarVersaoNova = async () => {
+    setBuscandoVersao(true)
+    try {
+      if ('serviceWorker' in navigator) {
+        const registros = await navigator.serviceWorker.getRegistrations()
+        await Promise.all(registros.map((registro) => registro.unregister()))
+      }
+      if ('caches' in window) {
+        const nomes = await caches.keys()
+        await Promise.all(nomes.map((nome) => caches.delete(nome)))
+      }
+    } catch {
+      // Se algo aqui falhar, recarregar mesmo assim já costuma resolver.
+    } finally {
+      location.reload()
+    }
+  }
 
   const limpar = () => {
     setErro(undefined)
@@ -244,6 +272,22 @@ export function TelaAjustes() {
         <p className="suave">
           Feito para guardar receitas de tricô e crochê, contar carreiras e pontos, marcar o tempo de
           cada peça e organizar as linhas e agulhas de casa. Funciona sem internet.
+        </p>
+
+        <p className="suave" style={{ marginTop: '0.8rem' }}>
+          Versão instalada: <strong>{VERSAO}</strong>
+        </p>
+
+        <button
+          className="botao contorno largo"
+          disabled={buscandoVersao}
+          onClick={() => void buscarVersaoNova()}
+        >
+          {buscandoVersao ? 'Buscando…' : 'Buscar versão nova'}
+        </button>
+        <p className="suave" style={{ marginTop: '0.5rem', marginBottom: 0 }}>
+          Use se alguém avisou que corrigiu alguma coisa e você ainda vê o problema. O app baixa tudo
+          de novo — suas receitas e trabalhos não são apagados.
         </p>
       </div>
     </>

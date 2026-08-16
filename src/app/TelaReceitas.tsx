@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import type { Navegacao } from './App'
 import { repositorio, useReceita, useReceitas } from '../dados/repositorio'
 import { interpretar } from '../nucleo/interpretador'
+import { resumoTecnico } from '../nucleo/diagnostico'
 import { descobrirTipo, lerPdf } from '../nucleo/pdf'
 import { ReceitaEmImagem } from './ReceitaEmImagem'
 import type { Receita, TipoTrabalho } from '../nucleo/tipos'
@@ -102,7 +103,12 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
 
   const entradaPdf = useRef<HTMLInputElement>(null)
   const [lendoPdf, setLendoPdf] = useState(false)
-  const [avisoPdf, setAvisoPdf] = useState<{ tipo: 'atencao' | 'tudo-certo'; texto: string }>()
+  const [avisoPdf, setAvisoPdf] = useState<{
+    tipo: 'atencao' | 'tudo-certo'
+    texto: string
+    /** Linha técnica para print, quando a causa não é óbvia. */
+    detalhe?: string
+  }>()
   const [pdfParaSubstituir, setPdfParaSubstituir] = useState<string>()
   // `paginas` só existe quando a receita veio em PDF; foto solta não tem páginas.
   const [receitaEmImagem, setReceitaEmImagem] = useState<{ arquivo: File; paginas?: number }>()
@@ -204,7 +210,10 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
           ? 'Esse PDF está protegido por senha, então não consigo abrir. Peça a receita sem senha, ou tire uma foto da tela e use a foto.'
           : corrompido
             ? 'Esse arquivo PDF parece corrompido ou incompleto. Tente baixar de novo, ou tire uma foto da receita e use a foto.'
-            : `Esse PDF não abriu (${mensagem || 'motivo desconhecido'}). Tente baixar de novo, ou tire uma foto da receita e use a foto.`,
+            : 'Esse PDF não abriu. Tente tirar uma foto da receita e usar a foto — costuma funcionar. Se quiser avisar quem cuida do app, tire um print desta tela inteira.',
+        // Some junto com o aviso; é o que a pessoa fotografa para a gente
+        // descobrir a causa sem precisar de Mac, cabo e Inspetor Web.
+        detalhe: senha || corrompido ? undefined : resumoTecnico(problema),
       })
     } finally {
       setLendoPdf(false)
@@ -283,7 +292,27 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
         />
       </div>
 
-      {avisoPdf && <Aviso tipo={avisoPdf.tipo}>{avisoPdf.texto}</Aviso>}
+      {avisoPdf && (
+        <Aviso tipo={avisoPdf.tipo}>
+          {avisoPdf.texto}
+          {avisoPdf.detalhe && (
+            <div
+              style={{
+                marginTop: '0.6rem',
+                padding: '0.5rem 0.6rem',
+                background: 'var(--superficie-2)',
+                borderRadius: '0.5rem',
+                color: 'var(--texto-suave)',
+                fontSize: '0.75rem',
+                lineHeight: 1.5,
+                wordBreak: 'break-word',
+              }}
+            >
+              {avisoPdf.detalhe}
+            </div>
+          )}
+        </Aviso>
+      )}
 
       {receitaEmImagem && (
         <ReceitaEmImagem
