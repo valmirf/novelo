@@ -72,11 +72,15 @@ const blocosDeTexto = pedacos
   .map((p) => `<script type="text/plain" id="${p.nome}">${p.base64}</script>`)
   .join('\n')
 
+// Endereço "data:" em vez de Blob: dentro da sandbox de verdade em que o
+// artefato roda, o WebKit falha ao carregar recurso do tipo blob: ("WebKitBlobResource
+// error 1") — confirmado com testes num motor Safari real, sandboxado como o
+// artefato. "data:" não passa por esse mecanismo, e é o mesmo tipo de endereço
+// que o próprio worker do pdf.js já usa aqui dentro com sucesso.
 const preparoDosPedacos = pedacos
   .map(
-    (p) => `const ${p.variavel} = URL.createObjectURL(
-    new Blob([atob(document.getElementById(${JSON.stringify(p.nome)}).textContent)], { type: 'text/javascript' }),
-  )`,
+    (p) =>
+      `const ${p.variavel} = 'data:text/javascript;base64,' + document.getElementById(${JSON.stringify(p.nome)}).textContent`,
   )
   .join('\n  ')
 
