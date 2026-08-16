@@ -1,35 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Navegacao } from './App'
 import { repositorio, useAjustes, useProjeto, useReceita } from '../dados/repositorio'
-import { interpretar, type Carreira } from '../nucleo/interpretador'
+import { interpretar } from '../nucleo/interpretador'
+import { montarSequencia } from '../nucleo/sequencia'
 import { aplicarTamanho, contarTamanhos, dependeDoTamanho, nomesDeTamanhos } from '../nucleo/tamanhos'
 import { novoId, type Contador, type Lembrete, type Projeto } from '../nucleo/tipos'
 import { formatarDuracao, useComandoPorVoz, useCronometro, useSom, useTelaAcesa } from './ganchos'
 import { Aviso, Campo, Confirmacao } from './ui'
-
-/** Uma linha de verdade do trabalho. "Carreiras 4 a 6" vira três entradas. */
-interface LinhaTrabalho {
-  numero: number
-  carreira: Carreira
-  /** Qual volta do bloco repetido, e de quantas. */
-  volta: number
-  totalVoltas: number
-}
-
-function achatar(carreiras: Carreira[]): LinhaTrabalho[] {
-  const linhas: LinhaTrabalho[] = []
-  for (const carreira of carreiras) {
-    carreira.numeros.forEach((numero, indice) => {
-      linhas.push({
-        numero,
-        carreira,
-        volta: indice + 1,
-        totalVoltas: carreira.numeros.length,
-      })
-    })
-  }
-  return linhas
-}
 
 export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; navegacao: Navegacao }) {
   const projeto = useProjeto(projetoId)
@@ -45,7 +22,6 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
   useTelaAcesa(ajustes.telaSempreAcesa)
 
   const leitura = useMemo(() => interpretar(receita?.texto ?? ''), [receita?.texto])
-  const linhas = useMemo(() => achatar(leitura.carreiras), [leitura])
 
   const quantosTamanhos = useMemo(() => contarTamanhos(receita?.texto ?? ''), [receita?.texto])
   const nomesTamanhos = useMemo(
@@ -61,6 +37,20 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
         ? texto
         : aplicarTamanho(texto, projeto.tamanho, quantosTamanhos),
     [verTodosOsTamanhos, projeto?.tamanho, quantosTamanhos],
+  )
+
+  // A sequência já vem com os blocos repetidos expandidos: "Trabalhar as carr
+  // 3 e 4 - 18 vezes" vira 18 passadas de verdade, para ela só tocar "próxima".
+  // O tamanho é aplicado ANTES de ler o número de repetições — senão "18, 20
+  // (22, 24) vezes" viraria sempre 18, e a peça sairia do comprimento errado.
+  const linhas = useMemo(
+    () =>
+      montarSequencia(leitura, (texto) =>
+        projeto?.tamanho === undefined
+          ? texto
+          : aplicarTamanho(texto, projeto.tamanho, quantosTamanhos),
+      ),
+    [leitura, projeto?.tamanho, quantosTamanhos],
   )
 
   const posicao = projeto?.carreiraAtual ?? 0
@@ -188,13 +178,9 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
 
   const grupoDaCarreira = atual?.carreira.itens.find((item) => item.tipo === 'grupo')
 
-  // Recados aparecem depois da última linha da carreira a que pertencem.
-  const recadosAqui =
-    atual && atual.volta === atual.totalVoltas
-      ? leitura.recados
-          .filter((recado) => recado.depoisDaCarreira === atual.carreira.indice)
-          .map((recado) => recado.texto)
-      : []
+  // Os recados já vêm presos ao passo certo pela montagem da sequência, e as
+  // instruções de repetir bloco não aparecem aqui: viraram carreiras de verdade.
+  const recadosAqui = atual?.recados ?? []
 
   return (
     <div className="trabalho">
@@ -265,9 +251,16 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
             <div className="carreira-atual">
               <div className="rotulo">
                 {atual.carreira.secao && <>{atual.carreira.secao} · </>}
-                {atual.carreira.rotulo}
+                Carreira {atual.numero}
                 {atual.carreira.lado && ` (${atual.carreira.lado})`}
-                {atual.totalVoltas > 1 && ` · ${atual.volta}ª vez de ${atual.totalVoltas}`}
+                {atual.totalRepeticoes > 1 && (
+                  <>
+                    {' · '}
+                    <strong>
+                      {atual.repeticao}ª vez de {atual.totalRepeticoes}
+                    </strong>
+                  </>
+                )}
               </div>
 
               {/*
