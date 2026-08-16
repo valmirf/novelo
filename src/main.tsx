@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './app/App'
 import { banco } from './dados/banco'
+import './nucleo/polyfills'
 import './estilo.css'
 
 const raiz = createRoot(document.getElementById('root')!)
