@@ -1,11 +1,38 @@
+<!--
+  A marca do Novelo: a placa de latão parafusada na gaveta do armarinho.
+
+  O N é vazado até a madeira, do jeito que letra de placa é cortada de
+  verdade. Os quatro parafusos são o que faz ler como chapa presa no móvel.
+
+  Duas tentativas descartadas ficam registradas: o novelo em creme e terracota
+  (o mundo que este redesenho substituiu) e a gaveta inteira com puxador
+  embaixo, que no tamanho de ícone lia como televisão com pé.
+-->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" rx="112" fill="#fdfaf6"/>
-  <circle cx="256" cy="248" r="150" fill="#7c4a3a"/>
-  <g fill="none" stroke="#fdfaf6" stroke-width="14" stroke-linecap="round" opacity="0.85">
-    <path d="M150 175 Q256 248 362 321"/>
-    <path d="M150 321 Q256 248 362 175"/>
-    <path d="M203 118 Q256 248 309 378"/>
-    <path d="M309 118 Q256 248 203 378"/>
+  <rect width="512" height="512" rx="96" fill="#241a12"/>
+
+  <!-- O veio da madeira, as mesmas ripas do fundo do app. -->
+  <g stroke="#000000" stroke-opacity="0.25" stroke-width="3">
+    <path d="M104 24V488M208 24V488M312 24V488M416 24V488"/>
   </g>
-  <path d="M366 330 Q430 380 412 440" fill="none" stroke="#7c4a3a" stroke-width="18" stroke-linecap="round"/>
+
+  <!-- A chapa. Aresta de luz em cima e sombra embaixo: a luz da cena vem de cima. -->
+  <rect x="88" y="88" width="336" height="336" rx="10" fill="#000000" fill-opacity="0.4"/>
+  <rect x="88" y="84" width="336" height="336" rx="10" fill="#d4a83c"/>
+  <path d="M98 88h316" stroke="#f0d68a" stroke-width="6" stroke-linecap="round"/>
+  <path d="M98 414h316" stroke="#8a6f2a" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- O N, cortado através do latão até a madeira. -->
+  <path d="M176 336V176h38l84 116V176h38v160h-38l-84-116v116Z" fill="#241a12"/>
+
+  <!-- Os quatro parafusos. -->
+  <g fill="#8a6f2a">
+    <circle cx="122" cy="118" r="11"/>
+    <circle cx="390" cy="118" r="11"/>
+    <circle cx="122" cy="386" r="11"/>
+    <circle cx="390" cy="386" r="11"/>
+  </g>
+  <g stroke="#241a12" stroke-opacity="0.65" stroke-width="4" stroke-linecap="round">
+    <path d="M116 118h12M384 118h12M116 386h12M384 386h12"/>
+  </g>
 </svg>

@@ -26,7 +26,7 @@ export function TelaProjetos({ navegacao }: { navegacao: Navegacao }) {
 
   return (
     <>
-      <Cabecalho titulo="Meus trabalhos" />
+      <Cabecalho titulo="Novelo" marca />
 
       <button className="botao principal largo gigante" onClick={() => navegacao.ir({ tela: 'projeto' })}>
         <IconeMais /> Começar um trabalho novo
@@ -40,7 +40,9 @@ export function TelaProjetos({ navegacao }: { navegacao: Navegacao }) {
             texto="Um trabalho é a peça que você está fazendo agora. Ele guarda em que carreira você parou, quanto tempo já levou e qual linha está usando."
           />
         ) : (
-          projetos.map((projeto) => (
+          <>
+          <h2 className="rotulo-lista">Meus trabalhos</h2>
+          {projetos.map((projeto) => (
             <div key={projeto.id} className="cartao">
               <div className="cartao-linha">
                 <Miniatura fotoId={projeto.fotoId} alt={`Foto de ${projeto.nome}`} />
@@ -72,7 +74,8 @@ export function TelaProjetos({ navegacao }: { navegacao: Navegacao }) {
                 </button>
               </div>
             </div>
-          ))
+          ))}
+          </>
         )}
       </div>
     </>

@@ -47,19 +47,49 @@ impõe cor de marca por cima do fio que ela está usando.
 
 ## Tipografia
 
-| Papel | Token | Pilha |
+Duas faces **hospedadas no próprio app** (`src/fontes/`), variáveis, licença
+OFL, 55 KB somados, versionadas pelo build e servidas por caminho relativo —
+funcionam em subpasta como a do GitHub Pages.
+
+| Papel | Token | Face |
 |---|---|---|
-| Leitura (a instrução) | `--leitura` | Charter, Iowan Old Style, Palatino, Georgia, serif |
-| Gravado (rótulo, número, botão) | `--gravado` | Avenir Next Condensed, Avenir Next, Helvetica Neue |
+| Leitura (a instrução) | `--leitura` | **Petrona** (Impallari Type) — serifa de texto quente, feita para leitura longa |
+| Gravado (rótulo, número, botão, marca) | `--gravado` | **Archivo Narrow** — grotesca estreita de sinalização, terminais retos |
 | Medida | `--medida` | ui-monospace, SF Mono, Menlo |
+
+Petrona é argentina, o que combina com o assunto sem precisar declarar nada. As
+pilhas de sistema continuam atrás das duas como rede de segurança. Acentos do
+português conferidos por medição de largura em ambas as faces, não presumidos.
 
 Rótulos em caixa alta com entreletra de 0.04–0.09em; a instrução em serifa com
 medida máxima de 30ch. Números com `tabular-nums` para não dançar ao contar.
 
-**Dívida conhecida:** nenhuma fonte pôde ser hospedada neste ambiente. Em Apple
-as pilhas caem em faces com caráter de verdade; em Android e Windows caem em
-Georgia e Roboto, e a voz gravada deixa de existir. Para venda no Brasil, isto é
-a maioria do mercado — hospedar uma face própria é o próximo passo real.
+**Dívida quitada.** Antes o app dependia de pilhas de sistema: em Apple caíam em
+faces com caráter, em Android e Windows caíam em Georgia e Roboto e a voz
+gravada deixava de existir — a maior parte do mercado brasileiro. Agora a voz é
+a mesma em qualquer aparelho.
+
+## A marca
+
+Antes do redesenho **a marca não aparecia em lugar nenhum do produto**: "Novelo"
+só existia no manifesto do PWA, então a pessoa usava o app sem nunca ver o nome.
+
+- **Assinatura** (`.marca`, `src/app/ui.tsx`) — NOVELO em Archivo Narrow 700,
+  caixa alta, entreletra de 0.22em: letra de latão **aplicada** na testeira do
+  móvel. Fio claro na aresta de cima e sombra projetada embaixo, coerente com a
+  luz da cena. Sem gradiente no glifo — a página não desenha metal polido em
+  lugar nenhum, então a marca também não finge. A marca usa a mesma condensada
+  dos rótulos de gaveta de propósito: ela pertence ao armário, não flutua acima
+  dele.
+- **Onde aparece** — só na testeira da tela inicial e uma vez em Ajustes
+  (`.marca.pequena`). Nas outras telas o título é a informação útil. O rótulo
+  "Meus trabalhos" desceu para o conteúdo (`.rotulo-lista`) para que a lista
+  continue nomeada por extenso.
+- **Ícone** (`public/icone.svg`, mais os PNGs de 192 e 512) — a placa de latão
+  parafusada na gaveta, com o N vazado até a madeira. Legibilidade conferida a
+  80px. Duas versões descartadas ficam registradas no próprio arquivo: o novelo
+  creme e terracota do mundo antigo, e a gaveta inteira com puxador embaixo, que
+  no tamanho de ícone lia como **televisão com pé**.
 
 ## Piso de acessibilidade (inegociável)
 

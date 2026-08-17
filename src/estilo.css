@@ -15,6 +15,34 @@
   botão sempre com palavra, nada escondido atrás de gesto.
 */
 
+/*
+  As faces, hospedadas aqui dentro. Antes eram pilhas de sistema: em Apple
+  caíam em faces com caráter, mas em Android e Windows caíam em Georgia e
+  Roboto — e a voz gravada do armarinho deixava de existir para a maior parte
+  do mercado brasileiro. Duas faces variáveis, 55 KB somados, licença aberta.
+
+  Petrona (Impallari Type, Argentina): serifa de texto quente, feita para
+  leitura longa. É a que ela lê com a agulha na mão.
+
+  Archivo Narrow: grotesca estreita de sinalização, com terminais retos — a
+  letra de etiqueta de gaveta e de chapa gravada.
+*/
+@font-face {
+  font-family: 'Petrona';
+  src: url('./fontes/petrona.woff2') format('woff2-variations');
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Archivo Narrow';
+  src: url('./fontes/archivo-narrow.woff2') format('woff2-variations');
+  font-weight: 500 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ------------------------------------------------------------------ mundo */
 
 :root {
@@ -65,9 +93,9 @@
   --sombra-gaveta: 0 2px 4px rgba(0, 0, 0, 0.45), 0 8px 20px rgba(0, 0, 0, 0.3);
   --sombra-etiqueta: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 14px rgba(0, 0, 0, 0.28);
 
-  /* Charter e Iowan têm caráter de verdade e vivem no aparelho dela. */
-  --leitura: Charter, 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
-  --gravado: 'Avenir Next Condensed', 'Avenir Next', 'Helvetica Neue', sans-serif;
+  /* Hospedadas: a voz é a mesma em qualquer aparelho. */
+  --leitura: 'Petrona', Charter, 'Iowan Old Style', Georgia, serif;
+  --gravado: 'Archivo Narrow', 'Avenir Next Condensed', 'Helvetica Neue', sans-serif;
   --medida: ui-monospace, 'SF Mono', Menlo, monospace;
 }
 
@@ -196,6 +224,56 @@ button {
   font-weight: 600;
   letter-spacing: 0.01em;
   color: var(--sobre-madeira);
+}
+
+/* ------------------------------------------------------------------- marca */
+
+/*
+  NOVELO em letra de latão aplicada na testeira do armário. A luz da cena vem
+  de cima, então a letra tem fio claro na aresta superior e sombra projetada
+  embaixo — é o que faz ler como metal preso na madeira, e não como texto
+  colorido de amarelo. Sem gradiente no glifo: a página não desenha metal
+  polido em lugar nenhum, então a marca também não finge.
+
+  Entreletra larga porque letra de placa é espaçada; caixa alta porque é
+  gravação, não frase.
+*/
+.marca {
+  font-family: var(--gravado);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  /* Compensa a entreletra sobrando depois da última letra. */
+  margin-right: -0.22em;
+  color: var(--latao);
+  text-shadow:
+    0 -1px 0 var(--latao-brilho),
+    0 2px 1px rgba(0, 0, 0, 0.55),
+    0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Dentro de texto corrido, a marca só muda de voz — não de tamanho nem de peso. */
+.marca.pequena {
+  letter-spacing: 0.14em;
+  margin-right: -0.14em;
+  font-size: 0.94em;
+  text-shadow:
+    0 -1px 0 rgba(240, 214, 138, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/*
+  Rótulo da lista, agora que o nome do app ocupa a testeira. Voz de etiqueta
+  pequena, para nomear sem competir com o nome dos trabalhos.
+*/
+.rotulo-lista {
+  font-family: var(--gravado);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--sobre-madeira-suave);
+  margin-bottom: 0.7rem;
 }
 
 /*

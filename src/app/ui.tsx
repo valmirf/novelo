@@ -2,12 +2,24 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { repositorio, useFoto } from '../dados/repositorio'
 import { IconeVoltar } from './icones'
 
+/*
+  A marca. Letra de latão aplicada na testeira do móvel — por isso é a mesma
+  condensada gravada dos rótulos de gaveta, e não uma fonte só dela: a marca
+  pertence ao armário, não flutua por cima dele.
+*/
+export function Marca({ pequena = false }: { pequena?: boolean }) {
+  return <span className={pequena ? 'marca pequena' : 'marca'}>Novelo</span>
+}
+
 export function Cabecalho({
   titulo,
+  marca,
   aoVoltar,
   acao,
 }: {
   titulo: string
+  /* Só a tela inicial mostra o nome; nas outras o título é a informação útil. */
+  marca?: boolean
   aoVoltar?: () => void
   acao?: ReactNode
 }) {
@@ -18,7 +30,7 @@ export function Cabecalho({
           <IconeVoltar /> Voltar
         </button>
       )}
-      <h1>{titulo}</h1>
+      <h1>{marca ? <Marca /> : titulo}</h1>
       {acao}
     </header>
   )

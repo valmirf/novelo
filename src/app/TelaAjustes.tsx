@@ -11,7 +11,7 @@ import {
 import { converterAmostra } from '../nucleo/amostra'
 import { VERSAO } from '../nucleo/diagnostico'
 import { VOZ_DISPONIVEL } from './ganchos'
-import { Aviso, Cabecalho, Campo, Escolha, Interruptor } from './ui'
+import { Aviso, Cabecalho, Campo, Escolha, Interruptor, Marca } from './ui'
 
 export function TelaAjustes() {
   const ajustes = useAjustes()
@@ -268,7 +268,9 @@ export function TelaAjustes() {
       </div>
 
       <div className="cartao">
-        <h2>Sobre o Novelo</h2>
+        <h2>
+          Sobre o <Marca pequena />
+        </h2>
         <p className="suave">
           Feito para guardar receitas de tricô e crochê, contar carreiras e pontos, marcar o tempo de
           cada peça e organizar as linhas e agulhas de casa. Funciona sem internet.
