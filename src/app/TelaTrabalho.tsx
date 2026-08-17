@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Navegacao } from './App'
-import { repositorio, useAjustes, useProjeto, useReceita } from '../dados/repositorio'
+import { repositorio, useAjustes, useLinhas, useProjeto, useReceita } from '../dados/repositorio'
 import { interpretar } from '../nucleo/interpretador'
 import { montarSequencia } from '../nucleo/sequencia'
+import { IconeAvancar, IconePausar, IconeRetomar, IconeVoltar } from './icones'
 import { aplicarTamanho, contarTamanhos, dependeDoTamanho, nomesDeTamanhos } from '../nucleo/tamanhos'
 import { novoId, type Contador, type Lembrete, type Projeto } from '../nucleo/tipos'
 import { formatarDuracao, useComandoPorVoz, useCronometro, useSom, useTelaAcesa } from './ganchos'
@@ -20,6 +21,30 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
   const [confirmandoZerar, setConfirmandoZerar] = useState(false)
 
   useTelaAcesa(ajustes.telaSempreAcesa)
+
+  /*
+   * O acento desta peça é a cor do fio que ela cadastrou — o app não impõe uma
+   * cor de marca por cima do material dela. Vale a primeira linha marcada no
+   * trabalho que tenha cor escolhida; sem nenhuma, fica o padrão.
+   */
+  const linhasGuardadas = useLinhas()
+  const fioDoTrabalho = useMemo(() => {
+    const marcadas = projeto?.linhaIds ?? []
+    for (const id of marcadas) {
+      const linha = linhasGuardadas.find((l) => l.id === id)
+      if (linha?.corHex) return linha
+    }
+    return undefined
+  }, [projeto?.linhaIds, linhasGuardadas])
+
+  // O acento da peça inteira passa a ser a cor do fio dela.
+  useEffect(() => {
+    const raiz = document.documentElement
+    if (fioDoTrabalho?.corHex) raiz.style.setProperty('--fio', fioDoTrabalho.corHex)
+    return () => {
+      raiz.style.removeProperty('--fio')
+    }
+  }, [fioDoTrabalho])
 
   const leitura = useMemo(() => interpretar(receita?.texto ?? ''), [receita?.texto])
 
@@ -217,7 +242,7 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
     <div className="trabalho">
       <header className="cabecalho">
         <button className="botao contorno" onClick={() => void sair()}>
-          <span aria-hidden="true">←</span> Sair
+          <IconeVoltar /> Sair
         </button>
         <h1 style={{ fontSize: '1.1rem' }}>{projeto.nome}</h1>
       </header>
@@ -279,16 +304,20 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
           </div>
         ) : (
           <>
-            <div className="carreira-atual">
+            {/*
+              A chave troca a cada carreira: é o que faz a gaveta entrar de
+              novo. Sem ela, o movimento acontece uma vez só e some.
+            */}
+            <div className="carreira-atual" key={posicao}>
               <div className="rotulo">
                 {atual.carreira.secao && <>{atual.carreira.secao} · </>}
-                Carreira {atual.numero}
+                <strong>Carreira {atual.numero}</strong>
                 {atual.carreira.lado && ` (${atual.carreira.lado})`}
                 {atual.totalRepeticoes > 1 && (
                   <>
                     {' · '}
                     <strong>
-                      {atual.repeticao}ª vez de {atual.totalRepeticoes}
+                      {atual.repeticao}ª de {atual.totalRepeticoes}
                     </strong>
                   </>
                 )}
@@ -319,6 +348,13 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
                       : 'Ver todos os tamanhos'}
                   </button>
                 )}
+
+              {fioDoTrabalho && (
+                <div className="fio-usado">
+                  <span className="fio-amostra" aria-hidden="true" />
+                  {fioDoTrabalho.marca} {fioDoTrabalho.nome} — {fioDoTrabalho.cor}
+                </div>
+              )}
 
               {atual.carreira.contagemConfiavel && atual.carreira.itens.length > 1 && (
                 <ul className="passos">
@@ -370,6 +406,37 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
               </div>
             )}
           </>
+        )}
+
+        {/*
+          O sulco: quanto da peça já foi. Ela vê o avanço sem ler número, e o
+          número fica do lado porque comprimento sozinho não é sinal suficiente.
+        */}
+        {!semReceita && linhas.length > 0 && (
+          <div className="sulco">
+            <div
+              className="sulco-trilho"
+              role="progressbar"
+              aria-valuemin={1}
+              aria-valuemax={linhas.length}
+              aria-valuenow={posicao + 1}
+              aria-label="Quanto da peça já foi trabalhado"
+            >
+              <div
+                className="sulco-feito"
+                style={{ transform: `scaleX(${(posicao + 1) / linhas.length})` }}
+              />
+            </div>
+            <span className="sulco-conta">
+              {posicao + 1} de {linhas.length}
+              {/* Quanto falta, em palavra: comprimento sozinho não é sinal. */}
+              <small>
+                {linhas.length - posicao - 1 === 0
+                  ? 'última'
+                  : `faltam ${linhas.length - posicao - 1}`}
+              </small>
+            </span>
+          </div>
         )}
 
         <div className="contadores">
@@ -437,7 +504,12 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
           </button>
         </div>
 
+        {/*
+          Só vale oferecer quando há mais de uma repetição: "Contar as 1
+          repetições" não é português, e contar uma repetição só não ajuda.
+        */}
         {grupoDaCarreira?.tipo === 'grupo' &&
+          grupoDaCarreira.repeticoes > 1 &&
           !projeto.contadores.some((c) => c.reiniciaEm === grupoDaCarreira.repeticoes) && (
             <button
               className="botao contorno largo"
@@ -450,7 +522,7 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
                       id: novoId(),
                       nome: 'Repetições',
                       valor: 0,
-                      cor: '#7c4a3a',
+                      cor: 'var(--fio)',
                       reiniciaEm: grupoDaCarreira.repeticoes,
                       voltas: 0,
                       vinculado: false,
@@ -479,7 +551,7 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
       <footer className="trabalho-rodape">
         <div className="cronometro">
           <div>
-            <div className="suave">Tempo desta sessão</div>
+            <div className="suave">Nesta sessão</div>
             <div className="tempo">{formatarDuracao(cronometro.segundos)}</div>
           </div>
           <div style={{ textAlign: 'right' }}>
@@ -507,27 +579,25 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
               }
             }}
           >
-            {cronometro.rodando ? '⏸ Pausar' : '▶ Continuar'}
+            {cronometro.rodando ? <><IconePausar /> Pausar</> : <><IconeRetomar /> Continuar</>}
           </button>
         </div>
 
-        <div className="linha-botoes">
-          <button
-            className="botao contorno"
-            style={{ flex: '0 0 32%' }}
-            disabled={projeto.travado || posicao === 0}
-            onClick={() => mover(-1)}
-          >
-            ← Voltar
-          </button>
-          <button
-            className="botao principal gigante"
-            disabled={projeto.travado || (!semReceita && posicao >= linhas.length - 1)}
-            onClick={() => mover(1)}
-          >
-            Próxima carreira →
-          </button>
-        </div>
+        {/* O puxador ocupa a largura toda: é a gaveta inteira que corre. */}
+        <button
+          className="botao principal gigante largo"
+          disabled={projeto.travado || (!semReceita && posicao >= linhas.length - 1)}
+          onClick={() => mover(1)}
+        >
+          Próxima carreira <IconeAvancar />
+        </button>
+        <button
+          className="botao contorno largo"
+          disabled={projeto.travado || posicao === 0}
+          onClick={() => mover(-1)}
+        >
+          <IconeVoltar /> Voltar uma carreira
+        </button>
       </footer>
 
       {criandoContador && (

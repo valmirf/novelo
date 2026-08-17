@@ -107,6 +107,12 @@ export interface Linha extends Base {
   marca: string
   nome: string
   cor: string
+  /**
+   * A cor de verdade do fio, escolhida no seletor. O nome ("vermelho") serve
+   * para ela procurar; esta serve para o app pintar o trabalho com a cor que
+   * ela está usando, em vez de uma cor de marca minha.
+   */
+  corHex?: string
   /** Lote de tingimento. Cores do mesmo tom variam entre lotes diferentes. */
   lote?: string
   composicao?: string

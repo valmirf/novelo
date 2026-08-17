@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { desenharPagina } from '../nucleo/pdf'
 import { Aviso } from './ui'
+import { IconeAvancar, IconeVoltar } from './icones'
 
 /**
  * Receita que chegou como imagem: print do Instagram, foto da revista, ou PDF
@@ -73,7 +74,7 @@ export function ReceitaEmImagem({
             alt={ehPdf ? `Página ${pagina} da receita` : 'Receita'}
             style={{
               width: '100%',
-              border: '2px solid var(--borda)',
+              border: '2px solid var(--latao-fosco)',
               borderRadius: '0.7rem',
               background: '#ffffff',
             }}
@@ -88,14 +89,14 @@ export function ReceitaEmImagem({
             disabled={pagina === 1}
             onClick={() => setPagina((atual) => atual - 1)}
           >
-            ← Página anterior
+            <IconeVoltar /> Página anterior
           </button>
           <button
             className="botao contorno"
             disabled={pagina === paginas}
             onClick={() => setPagina((atual) => atual + 1)}
           >
-            Próxima página →
+            Próxima página <IconeAvancar />
           </button>
         </div>
       )}

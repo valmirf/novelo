@@ -38,8 +38,8 @@ export function AvisoAtualizacao({ atualizar }: { atualizar: () => void }) {
         left: 0,
         right: 0,
         zIndex: 100,
-        background: 'var(--marca)',
-        color: 'var(--marca-texto)',
+        background: 'var(--latao)',
+        color: 'var(--madeira-baixa)',
         padding: '0.9rem 1rem',
         paddingBottom: 'max(0.9rem, env(safe-area-inset-bottom))',
         display: 'flex',
@@ -52,7 +52,7 @@ export function AvisoAtualizacao({ atualizar }: { atualizar: () => void }) {
       <span style={{ fontWeight: 700 }}>Tem uma versão nova do Novelo pronta.</span>
       <button
         className="botao"
-        style={{ background: 'var(--marca-texto)', color: 'var(--marca)', minHeight: '2.8rem' }}
+        style={{ background: 'var(--madeira-baixa)', color: 'var(--latao)', minHeight: '2.8rem' }}
         onClick={atualizar}
       >
         Atualizar agora

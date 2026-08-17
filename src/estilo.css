@@ -1,98 +1,81 @@
 /*
-  Sistema visual do Novelo.
+  O ARMARINHO — sistema visual do Novelo.
 
-  Pensado para quem tem vista cansada e pouca intimidade com celular:
-  - letra grande de verdade (base 20px, e a pessoa pode aumentar nos ajustes)
-  - contraste alto em todo texto, nada de cinza claro sobre branco
-  - área de toque mínima de 64px, bem acima do mínimo do sistema
-  - nada de ação escondida atrás de deslizar ou apertar e segurar
-  - todo botão tem palavra escrita, ícone nunca aparece sozinho
+  O app é o armário dela. Estrutura em nogueira escura, número e puxador em
+  latão gravado, e o que ela precisa LER sempre sobre papel de etiqueta claro —
+  é assim que um armarinho funciona: o móvel é escuro, a etiqueta é clara.
+
+  A cena manda no claro/escuro: tricô acontece dentro de casa, muitas vezes à
+  noite sob abajur, em sessões longas. Fundo escuro cansa menos nessa luz. Mas
+  o texto que ela lê com a agulha na mão nunca fica sobre madeira: fica sobre
+  papel, com tinta quase preta. Contraste medido, não estimado.
+
+  Regras de acessibilidade continuam sendo o piso e a beleza é construída
+  dentro delas: corpo a partir de 20px, alvo de toque de 64px, contraste alto,
+  botão sempre com palavra, nada escondido atrás de gesto.
 */
+
+/* ------------------------------------------------------------------ mundo */
 
 :root {
   --escala: 1;
 
-  --fundo: #fdfaf6;
-  --superficie: #ffffff;
-  --superficie-2: #f4ece3;
-  --borda: #d9c9ba;
-  --borda-forte: #b39d8a;
+  /* Estrutura: o móvel. */
+  --madeira: #241a12;
+  --madeira-alta: #33251a;
+  --madeira-baixa: #180f0a;
+  --veio: #0f0a06;
 
-  --texto: #241a14;
-  --texto-suave: #5c4a3f;
+  /* Latão: número gravado, puxador, aba viva. Nunca em texto corrido. */
+  --latao: #d4a83c;
+  --latao-fosco: #8a6f2a;
+  --latao-brilho: #f0d68a;
 
-  --marca: #7c4a3a;
-  --marca-clara: #f2e3dc;
-  --marca-texto: #ffffff;
-  /* Cor de texto sobre fundo claro da marca. No escuro, a marca não tem
-     contraste suficiente para servir de texto, então vira o texto comum. */
-  --acento-texto: #7c4a3a;
+  /* Papel de etiqueta: onde toda leitura acontece. */
+  --etiqueta: #f2ece0;
+  --etiqueta-sombra: #ded5c4;
+  --tinta: #17110c;
+  --tinta-suave: #4a3d2f;
 
-  --alerta: #8a5000;
-  --alerta-fundo: #fdf0dc;
-  --erro: #a3271a;
-  --erro-fundo: #fbe6e3;
-  --certo: #2c6a41;
-  --certo-fundo: #e3f2e8;
+  /* Sobre madeira, quando não há etiqueta. Medido em 12:1 e 7:1. */
+  --sobre-madeira: #f4efe6;
+  --sobre-madeira-suave: #c4b49c;
 
-  --raio: 1rem;
+  /*
+    Acento do trabalho. Vem da linha que ela cadastrou — o app não tem cor
+    própria de marca competindo com a cor do fio. Cor de novelo é o padrão até
+    ela escolher uma.
+  */
+  --fio: #9c3b4a;
+  --fio-claro: #c96b78;
+
+  /* Semânticos, cada um também com palavra ou forma na interface. */
+  --alerta: #b8801f;
+  --alerta-papel: #f7ecd4;
+  --erro: #a02b23;
+  --erro-papel: #f9e3e0;
+  --certo: #2f6b41;
+  --certo-papel: #e2f0e6;
+
+  --raio: 3px;
+  --raio-gaveta: 6px;
   --alvo: 3.4rem;
-  --sombra: 0 1px 3px rgba(60, 40, 30, 0.12);
+
+  /* Sombra de gaveta: deslocamento e desfoque de verdade, nunca halo. */
+  --sombra-gaveta: 0 2px 4px rgba(0, 0, 0, 0.45), 0 8px 20px rgba(0, 0, 0, 0.3);
+  --sombra-etiqueta: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 14px rgba(0, 0, 0, 0.28);
+
+  /* Charter e Iowan têm caráter de verdade e vivem no aparelho dela. */
+  --leitura: Charter, 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --gravado: 'Avenir Next Condensed', 'Avenir Next', 'Helvetica Neue', sans-serif;
+  --medida: ui-monospace, 'SF Mono', Menlo, monospace;
 }
 
 /*
-  Paleta escura. Ela aparece em duas situações e por isso está escrita duas
-  vezes: quando o sistema está no escuro e ninguém escolheu nada, e quando o
-  leitor escolheu escuro na mão. A repetição é chata mas CSS puro não deixa
-  compartilhar um bloco entre dois seletores diferentes.
+  O armarinho é um móvel escuro; não há versão clara dele. A interface se
+  compromete com um mundo só, e por isso não segue o tema do sistema — mas
+  pinta tudo explicitamente, para nunca herdar fundo de lugar nenhum.
 */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --fundo: #1a1512;
-    --superficie: #262019;
-    --superficie-2: #332a22;
-    --borda: #4a3e33;
-    --borda-forte: #6d5c4c;
-
-    --texto: #f7f0e8;
-    --texto-suave: #d0bfae;
-
-    --marca: #e8a68d;
-    --marca-clara: #3d2b23;
-    --marca-texto: #241a14;
-    --acento-texto: #f7f0e8;
-
-    --alerta: #f2c078;
-    --alerta-fundo: #3b2e18;
-    --erro: #f2a196;
-    --erro-fundo: #3d201c;
-    --certo: #96d7ae;
-    --certo-fundo: #1d3527;
-  }
-}
-
-:root[data-theme='dark'] {
-  --fundo: #1a1512;
-  --superficie: #262019;
-  --superficie-2: #332a22;
-  --borda: #4a3e33;
-  --borda-forte: #6d5c4c;
-
-  --texto: #f7f0e8;
-  --texto-suave: #d0bfae;
-
-  --marca: #e8a68d;
-  --marca-clara: #3d2b23;
-  --marca-texto: #241a14;
-  --acento-texto: #f7f0e8;
-
-  --alerta: #f2c078;
-  --alerta-fundo: #3b2e18;
-  --erro: #f2a196;
-  --erro-fundo: #3d201c;
-  --certo: #96d7ae;
-  --certo-fundo: #1d3527;
-}
 
 * {
   box-sizing: border-box;
@@ -101,16 +84,29 @@
 
 html {
   font-size: calc(20px * var(--escala));
+  background: var(--madeira);
 }
 
 body {
   margin: 0;
-  background: var(--fundo);
-  color: var(--texto);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--sobre-madeira);
+  background: var(--madeira);
+  /*
+    O veio da madeira: faixas verticais finas e irregulares, como as ripas de
+    um armário. Textura vem do mundo do assunto, não de um gradiente genérico.
+  */
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 37px,
+      rgba(0, 0, 0, 0.16) 37px 38px,
+      transparent 38px 61px,
+      rgba(255, 255, 255, 0.018) 61px 62px
+    ),
+    radial-gradient(120% 80% at 50% 0%, rgba(212, 168, 60, 0.05), transparent 60%);
+  font-family: var(--leitura);
   font-size: 1rem;
   line-height: 1.55;
-  /* Evita o zoom por dois toques comer a interface no iPhone. */
   touch-action: manipulation;
 }
 
@@ -118,28 +114,43 @@ h1,
 h2,
 h3 {
   margin: 0;
-  line-height: 1.25;
-  font-weight: 700;
+  line-height: 1.2;
+  font-weight: 600;
+  text-wrap: balance;
 }
 
 h1 {
-  font-size: 1.6rem;
+  font-size: 1.5rem;
+  letter-spacing: -0.015em;
 }
 h2 {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
 }
 h3 {
-  font-size: 1.05rem;
+  font-size: 1.02rem;
 }
 
 p {
   margin: 0 0 0.75rem;
 }
 
-/* Foco sempre visível: quem navega por teclado precisa enxergar onde está. */
+/* As superfícies que não desenhei ainda carregam o mundo. */
+::selection {
+  background: var(--latao);
+  color: var(--madeira-baixa);
+}
+
 :focus-visible {
-  outline: 3px solid var(--marca);
+  outline: 3px solid var(--latao);
   outline-offset: 3px;
+}
+
+input,
+textarea,
+select,
+button {
+  caret-color: var(--fio);
 }
 
 /* ---------------------------------------------------------------- estrutura */
@@ -150,13 +161,20 @@ p {
   flex-direction: column;
   max-width: 34rem;
   margin: 0 auto;
+  /* O corpo do armário: um pouco mais claro que a parede atrás. */
+  background: linear-gradient(180deg, var(--madeira-alta) 0%, var(--madeira) 22%);
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
 }
 
 .conteudo {
   flex: 1;
-  padding: 1rem 1rem 7rem;
+  padding: 1rem 1rem 7.5rem;
 }
 
+/*
+  Cabeçalho como a testeira do armário: faixa escura com um fio de latão
+  embaixo, do jeito que o móvel tem um friso separando as gavetas.
+*/
 .cabecalho {
   position: sticky;
   top: 0;
@@ -164,15 +182,20 @@ p {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  padding-top: max(0.75rem, env(safe-area-inset-top));
-  background: var(--fundo);
-  border-bottom: 2px solid var(--borda);
+  padding: 0.85rem 1rem;
+  padding-top: max(0.85rem, env(safe-area-inset-top));
+  background: linear-gradient(180deg, var(--madeira-alta), var(--madeira-baixa));
+  border-bottom: 1px solid var(--latao-fosco);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 }
 
 .cabecalho h1 {
   flex: 1;
   min-width: 0;
+  font-family: var(--gravado);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--sobre-madeira);
 }
 
 /* ------------------------------------------------------------------ botões */
@@ -184,40 +207,61 @@ p {
   gap: 0.5rem;
   min-height: var(--alvo);
   padding: 0.6rem 1.1rem;
-  border: 2px solid transparent;
+  border: 1px solid transparent;
   border-radius: var(--raio);
-  background: var(--superficie-2);
-  color: var(--texto);
-  font-family: inherit;
+  background: var(--madeira-alta);
+  color: var(--sobre-madeira);
+  font-family: var(--gravado);
   font-size: 1rem;
   font-weight: 600;
+  letter-spacing: 0.01em;
   text-align: center;
   cursor: pointer;
+  transition: transform 120ms cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
 .botao:active:not(:disabled) {
-  transform: scale(0.98);
+  transform: translateY(1px);
 }
 
 .botao:disabled {
-  opacity: 0.45;
+  opacity: 0.42;
   cursor: not-allowed;
 }
 
+/*
+  O puxador de latão. É o botão que ela toca com a agulha na mão, então é o
+  objeto mais sólido da tela: metal escovado, aresta de luz em cima, sombra
+  embaixo.
+*/
+/*
+  Latão escovado, não polido. O gradiente vertical forte lia como botão de
+  cassino; metal de móvel tem variação curta e uma aresta de luz só em cima.
+*/
 .botao.principal {
-  background: var(--marca);
-  color: var(--marca-texto);
+  background: var(--latao);
+  color: #2a1d08;
+  /* A aresta gravada: um sulco escuro embaixo e luz na borda de cima. */
+  border-color: #6d5620;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 246, 214, 0.5),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.22),
+    0 2px 3px rgba(0, 0, 0, 0.42),
+    0 7px 16px rgba(0, 0, 0, 0.26);
+  font-weight: 700;
+  letter-spacing: 0.015em;
 }
 
 .botao.contorno {
-  background: var(--superficie);
-  border-color: var(--borda-forte);
+  background: var(--madeira-alta);
+  border-color: var(--latao-fosco);
+  color: var(--sobre-madeira);
 }
 
 .botao.perigo {
-  background: var(--erro-fundo);
-  color: var(--erro);
+  background: var(--madeira-alta);
   border-color: var(--erro);
+  color: #f2a49c;
 }
 
 .botao.largo {
@@ -226,7 +270,7 @@ p {
 
 .botao.gigante {
   min-height: 5rem;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
 }
 
 .linha-botoes {
@@ -240,15 +284,20 @@ p {
   min-width: 8rem;
 }
 
-/* ------------------------------------------------------------------ cartões */
+/* ------------------------------------------------------- gaveta (o cartão) */
 
+/*
+  Cada item é a frente de uma gaveta: madeira um tom acima, friso de latão à
+  esquerda como o encaixe do puxador, sombra com deslocamento de verdade.
+*/
 .cartao {
-  background: var(--superficie);
-  border: 2px solid var(--borda);
-  border-radius: var(--raio);
+  position: relative;
+  background: linear-gradient(180deg, var(--madeira-alta), var(--madeira));
+  border: 0;
+  border-radius: var(--raio-gaveta);
   padding: 1rem;
   margin-bottom: 0.85rem;
-  box-shadow: var(--sombra);
+  box-shadow: var(--sombra-gaveta);
 }
 
 .cartao.clicavel {
@@ -256,6 +305,7 @@ p {
   width: 100%;
   text-align: left;
   font: inherit;
+  font-family: var(--leitura);
   color: inherit;
   cursor: pointer;
 }
@@ -264,83 +314,107 @@ p {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  font-family: var(--gravado);
   font-size: 1.15rem;
-  font-weight: 700;
+  font-weight: 600;
+  color: var(--sobre-madeira);
   margin-bottom: 0.3rem;
 }
 
 .cartao-linha {
   display: flex;
-  gap: 0.8rem;
+  gap: 0.85rem;
   align-items: center;
 }
 
 .miniatura {
   width: 4.5rem;
   height: 4.5rem;
-  border-radius: 0.7rem;
+  border-radius: 3px;
   object-fit: cover;
-  background: var(--superficie-2);
+  background: var(--madeira-baixa);
+  border: 1px solid var(--latao-fosco);
   flex-shrink: 0;
 }
 
 .suave {
-  color: var(--texto-suave);
+  color: var(--sobre-madeira-suave);
   font-size: 0.9rem;
 }
 
+/* Etiqueta de gaveta: papel claro, texto pequeno em caixa alta. */
 .selo {
   display: inline-block;
-  padding: 0.15rem 0.6rem;
-  border-radius: 999px;
-  background: var(--marca-clara);
-  color: var(--acento-texto);
-  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+  background: var(--etiqueta);
+  color: var(--tinta);
+  font-family: var(--gravado);
+  font-size: 0.78rem;
   font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
 .selo.alerta {
-  background: var(--alerta-fundo);
-  color: var(--alerta);
+  background: var(--alerta-papel);
+  color: #6b4a10;
 }
 .selo.certo {
-  background: var(--certo-fundo);
-  color: var(--certo);
+  background: var(--certo-papel);
+  color: #1c4a2b;
 }
 
-/* ---------------------------------------------------------------- formulário */
+/* --------------------------------------------------------------- formulário */
 
 .campo {
   display: block;
-  margin-bottom: 1.1rem;
+  margin-bottom: 1.2rem;
 }
 
 .campo > span {
   display: block;
-  font-weight: 700;
-  margin-bottom: 0.35rem;
+  font-family: var(--gravado);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  color: var(--latao);
+  margin-bottom: 0.4rem;
 }
 
 .campo .ajuda {
+  display: block;
+  font-family: var(--leitura);
   font-weight: 400;
-  color: var(--texto-suave);
-  font-size: 0.85rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--sobre-madeira-suave);
+  font-size: 1rem;
+  margin-top: 0.15rem;
 }
 
+/* Campo preenchível é papel: ela escreve sobre papel, não sobre madeira. */
 .campo input,
 .campo select,
 .campo textarea {
   width: 100%;
   min-height: var(--alvo);
-  padding: 0.6rem 0.75rem;
-  border: 2px solid var(--borda-forte);
-  border-radius: 0.7rem;
-  background: var(--superficie);
-  color: var(--texto);
-  font-family: inherit;
-  /* 1rem aqui já passa de 16px, então o iPhone não dá zoom ao focar. */
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--etiqueta-sombra);
+  border-radius: 2px;
+  background: var(--etiqueta);
+  color: var(--tinta);
+  font-family: var(--leitura);
+  /* 1rem já passa de 16px: o iPhone não dá zoom ao focar. */
   font-size: 1rem;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder {
+  color: #6d6053;
 }
 
 .campo textarea {
@@ -369,20 +443,24 @@ p {
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  padding: 0.5rem;
-  border: 2px solid var(--borda-forte);
-  border-radius: 0.7rem;
-  background: var(--superficie);
-  color: var(--texto);
-  font: inherit;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--latao-fosco);
+  border-radius: var(--raio);
+  background: var(--madeira-alta);
+  color: var(--sobre-madeira);
+  font-family: var(--gravado);
   font-weight: 600;
+  font-size: 0.97rem;
   cursor: pointer;
 }
 
+/* Selecionado é gaveta puxada: latão sólido, e some a dúvida. */
 .opcao[aria-pressed='true'] {
-  background: var(--marca);
-  border-color: var(--marca);
-  color: var(--marca-texto);
+  background: var(--latao);
+  border-color: #6d5620;
+  color: #2a1d08;
+  font-weight: 700;
+  box-shadow: inset 0 1px 0 rgba(255, 246, 214, 0.45), inset 0 -2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .interruptor {
@@ -392,67 +470,122 @@ p {
   gap: 1rem;
   width: 100%;
   min-height: var(--alvo);
-  padding: 0.7rem 1rem;
-  border: 2px solid var(--borda);
-  border-radius: var(--raio);
-  background: var(--superficie);
-  color: var(--texto);
-  font: inherit;
+  padding: 0.75rem 1rem;
+  border: 0;
+  border-radius: var(--raio-gaveta);
+  background: linear-gradient(180deg, var(--madeira-alta), var(--madeira));
+  color: var(--sobre-madeira);
+  font-family: var(--leitura);
+  font-size: 1rem;
   text-align: left;
   margin-bottom: 0.7rem;
   cursor: pointer;
+  box-shadow: var(--sombra-gaveta);
 }
 
 .interruptor .estado {
+  font-family: var(--gravado);
   font-weight: 700;
-  color: var(--acento-texto);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: var(--latao);
   white-space: nowrap;
 }
 
 /* ------------------------------------------------------------------- avisos */
 
+/*
+  Aviso é papel enfiado na gaveta: fundo de papel, tinta escura, e uma barra
+  de cor à esquerda. Cor nunca é o único sinal — o texto sempre diz o que é.
+*/
+/*
+  Aviso é um papel enfiado na gaveta. A distinção vem do papel inteiro tingido
+  e do carimbo redondo à esquerda — não de uma barra de cor na lateral, que é o
+  tique mais batido de interface gerada por máquina.
+*/
 .aviso {
   display: flex;
-  gap: 0.6rem;
-  padding: 0.85rem 1rem;
-  border-radius: var(--raio);
-  border: 2px solid;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.9rem 1rem;
+  border-radius: 2px;
+  border: 1px solid;
   margin-bottom: 0.85rem;
-  font-size: 0.95rem;
+  font-family: var(--leitura);
+  font-size: 1rem;
+  line-height: 1.55;
+  box-shadow: var(--sombra-etiqueta);
+}
+
+/* O carimbo: círculo de tinta com o sinal dentro. */
+.aviso > span:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0.05rem;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  font-family: var(--gravado);
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .aviso.atencao {
-  background: var(--alerta-fundo);
-  border-color: var(--alerta);
-  color: var(--alerta);
+  background: var(--alerta-papel);
+  border-color: rgba(184, 128, 31, 0.5);
+  color: #5c3f0d;
 }
 
 .aviso.problema {
-  background: var(--erro-fundo);
-  border-color: var(--erro);
-  color: var(--erro);
+  background: var(--erro-papel);
+  border-color: rgba(160, 43, 35, 0.5);
+  color: #7a1f19;
 }
 
 .aviso.tudo-certo {
-  background: var(--certo-fundo);
-  border-color: var(--certo);
-  color: var(--certo);
+  background: var(--certo-papel);
+  border-color: rgba(47, 107, 65, 0.5);
+  color: #1b4529;
 }
 
 .vazio {
   text-align: center;
-  padding: 2.5rem 1rem;
-  color: var(--texto-suave);
+  padding: 2.75rem 1rem;
+  color: var(--sobre-madeira-suave);
+}
+
+.vazio h2 {
+  color: var(--sobre-madeira);
+  margin-bottom: 0.5rem;
 }
 
 .vazio .desenho {
-  font-size: 3.5rem;
   line-height: 1;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
 }
 
-/* --------------------------------------------------------------- abas de baixo */
+/*
+  O ícone da tela vazia é o mesmo traço da aba, num quadro maior. O desenho
+  precisa preencher o invólucro: sem isto ele fica no tamanho da aba dentro de
+  uma caixa grande, e some no meio da tela.
+*/
+.icone-grande svg {
+  width: 100%;
+  height: 100%;
+  stroke-width: 1.1;
+}
 
+/* ------------------------------------------------------- trilho de gavetas */
+
+/*
+  A navegação é o rodapé do armário: quatro gavetas. A aberta ganha o latão e
+  um friso em cima, como a gaveta que se destaca do móvel.
+*/
 .abas {
   position: fixed;
   bottom: 0;
@@ -460,48 +593,58 @@ p {
   right: 0;
   z-index: 20;
   display: flex;
-  background: var(--superficie);
-  border-top: 2px solid var(--borda);
+  background: linear-gradient(180deg, var(--madeira-baixa), var(--veio));
+  border-top: 1px solid var(--latao-fosco);
   padding-bottom: env(safe-area-inset-bottom);
   max-width: 34rem;
   margin: 0 auto;
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.45);
 }
 
 .aba {
+  position: relative;
   flex: 1;
   min-height: 4rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.1rem;
+  gap: 0.15rem;
   border: none;
   background: none;
-  color: var(--texto-suave);
-  font: inherit;
-  font-size: 0.75rem;
+  color: var(--sobre-madeira-suave);
+  font-family: var(--gravado);
+  font-size: 0.76rem;
   font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   cursor: pointer;
-  padding: 0.4rem 0.2rem;
+  padding: 0.45rem 0.2rem;
 }
 
 .aba .simbolo {
-  font-size: 1.35rem;
+  font-size: 1.3rem;
   line-height: 1;
 }
 
 .aba[aria-current='page'] {
-  color: var(--acento-texto);
-  background: var(--marca-clara);
+  color: var(--latao-brilho);
+  background: linear-gradient(180deg, rgba(212, 168, 60, 0.14), transparent 70%);
+}
+
+/* O friso de latão da gaveta aberta. */
+.aba[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 18%;
+  right: 18%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--latao), transparent);
 }
 
 /* ------------------------------------------------------------ modo trabalho */
 
-/*
-  A tela de trabalho é uma moldura fixa: só o miolo rola. Assim o botão
-  "Próxima carreira" nunca sai da vista, que é o único botão que ela precisa
-  achar sem procurar, com a agulha na mão.
-*/
 .trabalho {
   height: 100dvh;
   max-width: 34rem;
@@ -509,7 +652,7 @@ p {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--fundo);
+  background: linear-gradient(180deg, var(--madeira-alta) 0%, var(--madeira) 20%);
 }
 
 .trabalho-corpo {
@@ -520,118 +663,298 @@ p {
   -webkit-overflow-scrolling: touch;
 }
 
+/*
+  A ETIQUETA. O coração do app: é aqui que ela lê com a agulha na mão, então é
+  papel claro com tinta quase preta — o contraste mais alto da interface
+  inteira — cercado por madeira.
+*/
 .carreira-atual {
-  background: var(--superficie);
-  border: 3px solid var(--marca);
-  border-radius: var(--raio);
-  padding: 1.1rem;
-  margin-bottom: 1rem;
+  position: relative;
+  background: var(--etiqueta);
+  color: var(--tinta);
+  border: 0;
+  border-radius: 2px;
+  padding: 1.15rem 1.15rem 1.25rem;
+  margin-bottom: 1.1rem;
+  box-shadow: var(--sombra-etiqueta);
+  overflow: hidden;
 }
 
+/* O furo de fichário da etiqueta presa na gaveta. */
+.carreira-atual::before {
+  content: '';
+  position: absolute;
+  top: 1.1rem;
+  left: 0.7rem;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--madeira);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.6);
+}
+
+/* A linha gravada: parte da peça, número da carreira, lado do trabalho. */
 .carreira-atual .rotulo {
-  font-size: 1.1rem;
+  font-family: var(--gravado);
+  font-size: 0.8rem;
   font-weight: 700;
-  color: var(--acento-texto);
-  margin-bottom: 0.4rem;
+  letter-spacing: 0.055em;
+  line-height: 1.45;
+  text-transform: uppercase;
+  color: #6b5636;
+  margin-bottom: 0.7rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--etiqueta-sombra);
+  text-wrap: balance;
 }
 
-.carreira-atual .instrucao {
-  font-size: 1.5rem;
+.carreira-atual .rotulo strong {
+  color: var(--tinta);
+}
+
+/*
+  A amostra do fio: um quadrado da cor que ela cadastrou, com o nome da linha
+  escrito ao lado. Cor nunca vem sozinha, e um app sobre fios finalmente mostra
+  o fio — sem virar barra de cor decorativa.
+*/
+.fio-usado {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.7rem;
+  font-family: var(--gravado);
+  font-size: 0.85rem;
   font-weight: 600;
-  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
 }
 
-/* A instrução é montada a partir da receita, então a maiúscula vem do estilo. */
+.fio-amostra {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 2px;
+  background: var(--fio);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+/* A instrução: o texto que ela lê. Serifa, corpo grande, medida curta. */
+.carreira-atual .instrucao {
+  font-family: var(--leitura);
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.42;
+  color: var(--tinta);
+  max-width: 30ch;
+}
+
 .carreira-atual .instrucao::first-letter,
 .passo::first-letter {
   text-transform: uppercase;
 }
 
+.carreira-atual .suave {
+  color: var(--tinta-suave);
+}
+
+.carreira-atual .botao {
+  background: #e4dccb;
+  border-color: #c4b8a2;
+  color: var(--tinta);
+}
+
+/* O que vem depois: papel virado, mais apagado, atrás da etiqueta da vez. */
 .carreira-proxima {
-  background: var(--superficie-2);
-  border: 2px dashed var(--borda-forte);
-  border-radius: var(--raio);
+  background: rgba(242, 236, 224, 0.09);
+  border: 1px dashed rgba(212, 168, 60, 0.35);
+  border-radius: 2px;
   padding: 0.85rem 1rem;
   margin-bottom: 1rem;
-  color: var(--texto-suave);
+  color: var(--sobre-madeira-suave);
+  font-size: 1rem;
+}
+
+.carreira-proxima strong {
+  font-family: var(--gravado);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: var(--latao);
 }
 
 .passos {
   list-style: none;
-  margin: 0.8rem 0 0;
+  margin: 0.9rem 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .passo {
-  padding: 0.6rem 0.85rem;
-  border-radius: 0.7rem;
-  background: var(--superficie-2);
-  font-size: 1.05rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 2px;
+  background: #e7dfcf;
+  color: var(--tinta);
+  font-size: 1.02rem;
 }
 
+/*
+  Repetição marcada com colchete, que é como a própria notação de tricô marca
+  um trecho que se repete — e não com uma barra de cor na lateral.
+*/
 .passo.repeticao {
-  border-left: 5px solid var(--marca);
+  position: relative;
+  padding-left: 1.1rem;
+  font-weight: 600;
 }
+
+.passo.repeticao::before {
+  content: '';
+  position: absolute;
+  left: 0.4rem;
+  top: 0.55rem;
+  bottom: 0.55rem;
+  width: 5px;
+  border: 1px solid var(--fio);
+  border-right: 0;
+}
+
+/* ------------------------------------------------------- sulco de gavetas */
+
+/*
+  Quanto falta da peça, legível de relance — sem ler número. É o sulco do
+  móvel: a parte feita vira latão, o que falta fica em madeira funda. Vem com
+  texto ao lado, porque cor e comprimento nunca são o único sinal.
+*/
+.sulco {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+}
+
+.sulco-trilho {
+  flex: 1;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--veio);
+  /* As divisões do móvel: uma marca a cada gaveta do trilho. */
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0 calc(10% - 1px),
+    rgba(212, 168, 60, 0.28) calc(10% - 1px) 10%
+  );
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.75), inset 0 -1px 0 rgba(212, 168, 60, 0.12);
+  overflow: hidden;
+}
+
+/*
+  Cresce por transform, não por largura: animar largura obriga o navegador a
+  refazer o layout a cada quadro, e isso engasga justo no aparelho mais fraco.
+*/
+.sulco-feito {
+  width: 100%;
+  height: 100%;
+  transform-origin: left center;
+  background: var(--latao);
+  box-shadow: inset 0 1px 0 rgba(255, 246, 214, 0.4);
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sulco-conta {
+  font-family: var(--gravado);
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--sobre-madeira);
+  white-space: nowrap;
+  text-align: right;
+  line-height: 1.15;
+}
+
+.sulco-conta small {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--latao);
+}
+
+/* ------------------------------------------------------------- contadores */
 
 .contadores {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
   gap: 0.7rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.1rem;
 }
 
+/* Cada contador é um mostrador de latão embutido na madeira. */
 .contador {
-  background: var(--superficie);
-  border: 2px solid var(--borda);
-  border-radius: var(--raio);
-  padding: 0.8rem;
+  background: radial-gradient(120% 100% at 50% 0%, var(--madeira-alta), var(--madeira-baixa));
+  border: 0;
+  border-radius: var(--raio-gaveta);
+  padding: 0.85rem 0.7rem;
   text-align: center;
+  box-shadow: inset 0 1px 0 rgba(212, 168, 60, 0.2), var(--sombra-gaveta);
 }
 
 .contador .nome {
-  font-size: 0.85rem;
+  font-family: var(--gravado);
+  font-size: 0.76rem;
   font-weight: 700;
-  color: var(--texto-suave);
-  margin-bottom: 0.2rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--latao);
+  margin-bottom: 0.25rem;
 }
 
+/* O número gravado. Tabular, para não dançar ao contar. */
 .contador .valor {
+  font-family: var(--gravado);
   font-size: 2.6rem;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--latao-brilho);
   font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
 }
 
 .contador .voltas {
-  font-size: 0.8rem;
-  color: var(--texto-suave);
+  font-family: var(--gravado);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  color: var(--sobre-madeira-suave);
+  margin-top: 0.15rem;
 }
 
 .contador-botoes {
   display: flex;
   gap: 0.4rem;
-  margin-top: 0.6rem;
+  margin-top: 0.65rem;
 }
 
 .contador-botoes .botao {
   flex: 1;
-  min-height: 3rem;
+  min-height: var(--alvo);
   padding: 0.4rem;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  font-family: var(--gravado);
 }
+
+/* --------------------------------------------------------------- o puxador */
 
 .trabalho-rodape {
   flex-shrink: 0;
-  background: var(--superficie);
-  border-top: 2px solid var(--borda);
-  padding: 0.8rem 1rem;
-  padding-bottom: max(0.8rem, env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, var(--madeira-baixa), var(--veio));
+  border-top: 1px solid var(--latao-fosco);
+  padding: 0.85rem 1rem;
+  padding-bottom: max(0.85rem, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.65rem;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .cronometro {
@@ -639,18 +962,42 @@ p {
   align-items: center;
   justify-content: space-between;
   gap: 0.8rem;
+  flex-wrap: nowrap;
+}
+
+.cronometro > div {
+  min-width: 0;
+}
+
+.cronometro .suave {
+  font-family: var(--gravado);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--latao);
+  white-space: nowrap;
 }
 
 .cronometro .tempo {
-  font-size: 1.8rem;
-  font-weight: 800;
+  font-family: var(--gravado);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--sobre-madeira);
   font-variant-numeric: tabular-nums;
 }
 
 .travado-aviso {
   text-align: center;
+  font-family: var(--gravado);
   font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
   color: var(--alerta);
+  padding: 0.5rem;
+  border: 1px dashed var(--alerta);
+  border-radius: 2px;
+  margin-bottom: 0.85rem;
 }
 
 /* --------------------------------------------------------------- diálogo */
@@ -659,7 +1006,7 @@ p {
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: rgba(20, 12, 8, 0.55);
+  background: rgba(10, 6, 3, 0.72);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -669,20 +1016,48 @@ p {
 .dialogo {
   width: 100%;
   max-width: 32rem;
-  background: var(--superficie);
-  border-radius: var(--raio);
-  padding: 1.25rem;
+  background: linear-gradient(180deg, var(--madeira-alta), var(--madeira));
+  border: 1px solid var(--latao-fosco);
+  border-radius: var(--raio-gaveta);
+  padding: 1.3rem;
   max-height: 85dvh;
   overflow-y: auto;
   margin-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.4), 0 20px 50px rgba(0, 0, 0, 0.6);
 }
 
 .dialogo h2 {
+  font-family: var(--gravado);
   margin-bottom: 0.6rem;
+  color: var(--sobre-madeira);
+}
+
+/* ------------------------------------------------------------------ motion */
+
+/*
+  Um movimento autoral só: a gaveta que entra quando ela avança a carreira.
+  Sai da direita, desacelera como madeira em trilho, e para. Nada de entrada
+  idêntica em toda seção.
+*/
+@keyframes gaveta-entra {
+  from {
+    transform: translateX(14px);
+    opacity: 0.55;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.carreira-atual {
+  animation: gaveta-entra 260ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * {
+  *,
+  *::before,
+  *::after {
     animation: none !important;
     transition: none !important;
   }

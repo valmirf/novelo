@@ -6,6 +6,7 @@ import { TelaMateriais, TelaLinhaEditor, TelaAgulhaEditor } from './TelaMateriai
 import { TelaTrabalho } from './TelaTrabalho'
 import { TelaAjustes } from './TelaAjustes'
 import { AvisoAtualizacao, useAtualizacaoDisponivel } from './AvisoAtualizacao'
+import { IconeAjustes, IconeMateriais, IconeReceitas, IconeTrabalhos } from './icones'
 
 export type Rota =
   | { tela: 'projetos' }
@@ -24,10 +25,10 @@ export interface Navegacao {
 }
 
 const ABAS = [
-  { tela: 'projetos', simbolo: '🧶', texto: 'Trabalhos' },
-  { tela: 'receitas', simbolo: '📖', texto: 'Receitas' },
-  { tela: 'materiais', simbolo: '🧵', texto: 'Materiais' },
-  { tela: 'ajustes', simbolo: '⚙️', texto: 'Ajustes' },
+  { tela: 'projetos', Icone: IconeTrabalhos, texto: 'Trabalhos' },
+  { tela: 'receitas', Icone: IconeReceitas, texto: 'Receitas' },
+  { tela: 'materiais', Icone: IconeMateriais, texto: 'Materiais' },
+  { tela: 'ajustes', Icone: IconeAjustes, texto: 'Ajustes' },
 ] as const
 
 export function App() {
@@ -96,8 +97,8 @@ export function App() {
             aria-current={atual.tela === aba.tela ? 'page' : undefined}
             onClick={() => trocarAba(aba.tela)}
           >
-            <span className="simbolo" aria-hidden="true">
-              {aba.simbolo}
+            <span className="simbolo">
+              <aba.Icone />
             </span>
             {aba.texto}
           </button>

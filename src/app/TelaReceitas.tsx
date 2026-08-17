@@ -5,6 +5,7 @@ import { interpretar } from '../nucleo/interpretador'
 import { resumoTecnico } from '../nucleo/diagnostico'
 import { descobrirTipo, lerPdf } from '../nucleo/pdf'
 import { ReceitaEmImagem } from './ReceitaEmImagem'
+import { IconeBusca, IconeGrande, IconeMais, IconeReceitas } from './icones'
 import type { Receita, TipoTrabalho } from '../nucleo/tipos'
 import { Aviso, Cabecalho, Campo, Confirmacao, Escolha, Miniatura, SeletorFoto, Vazio } from './ui'
 
@@ -43,7 +44,7 @@ export function TelaReceitas({ navegacao }: { navegacao: Navegacao }) {
       <Cabecalho titulo="Receitas" />
 
       <button className="botao principal largo gigante" onClick={() => navegacao.ir({ tela: 'receita' })}>
-        <span aria-hidden="true">＋</span> Guardar uma receita nova
+        <IconeMais /> Guardar uma receita nova
       </button>
       <p className="suave" style={{ marginTop: '0.5rem' }}>
         Você pode trazer de um PDF, de uma foto da receita, ou escrever à mão.
@@ -65,12 +66,12 @@ export function TelaReceitas({ navegacao }: { navegacao: Navegacao }) {
       <div style={{ marginTop: '1.2rem' }}>
         {receitas.length === 0 ? (
           <Vazio
-            desenho="📖"
+            desenho={<IconeGrande><IconeReceitas /></IconeGrande>}
             titulo="Nenhuma receita ainda"
             texto="Guarde aqui as receitas que você usa. Pode trazer de um PDF, de um print do Instagram, copiar de um site ou digitar do caderno."
           />
         ) : filtradas.length === 0 ? (
-          <Vazio desenho="🔎" titulo="Nada encontrado" texto="Nenhuma receita com esse nome." />
+          <Vazio desenho={<IconeGrande><IconeBusca /></IconeGrande>} titulo="Nada encontrado" texto="Nenhuma receita com esse nome." />
         ) : (
           filtradas.map((receita) => (
             <button
@@ -282,7 +283,7 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
           disabled={lendoPdf}
           onClick={() => entradaPdf.current?.click()}
         >
-          {lendoPdf ? 'Lendo o arquivo…' : '📄 Trazer de um arquivo ou foto'}
+          {lendoPdf ? 'Lendo o arquivo…' : 'Trazer de um arquivo ou foto'}
         </button>
 
         <textarea
@@ -300,9 +301,9 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
               style={{
                 marginTop: '0.6rem',
                 padding: '0.5rem 0.6rem',
-                background: 'var(--superficie-2)',
+                background: 'var(--madeira-alta)',
                 borderRadius: '0.5rem',
-                color: 'var(--texto-suave)',
+                color: 'var(--tinta-suave)',
                 fontSize: '0.75rem',
                 lineHeight: 1.5,
                 wordBreak: 'break-word',

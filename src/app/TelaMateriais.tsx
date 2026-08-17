@@ -3,6 +3,7 @@ import type { Navegacao } from './App'
 import { repositorio, useAgulhas, useLinhas } from '../dados/repositorio'
 import type { Agulha, EspessuraLinha, Linha, TipoAgulha } from '../nucleo/tipos'
 import { Cabecalho, Campo, Confirmacao, Escolha, Miniatura, SeletorFoto, Vazio } from './ui'
+import { IconeAgulha, IconeGrande, IconeMais, IconeMateriais } from './icones'
 
 const ESPESSURAS: EspessuraLinha[] = ['muito fina', 'fina', 'média', 'grossa', 'muito grossa']
 const TIPOS_AGULHA: TipoAgulha[] = ['croche', 'trico reta', 'trico circular', 'trico de meia']
@@ -42,7 +43,7 @@ export function TelaMateriais({ navegacao }: { navegacao: Navegacao }) {
       {aba === 'linhas' ? (
         <>
           <button className="botao principal largo gigante" onClick={() => navegacao.ir({ tela: 'linha' })}>
-            <span aria-hidden="true">＋</span> Guardar uma linha
+            <IconeMais /> Guardar uma linha
           </button>
 
           {linhas.length > 0 && (
@@ -61,7 +62,7 @@ export function TelaMateriais({ navegacao }: { navegacao: Navegacao }) {
           <div style={{ marginTop: '1rem' }}>
             {linhas.length === 0 ? (
               <Vazio
-                desenho="🧵"
+                desenho={<IconeGrande><IconeMateriais /></IconeGrande>}
                 titulo="Nenhuma linha guardada"
                 texto="Anote as linhas que você tem em casa: marca, cor, lote e quantos novelos sobraram. Assim dá para saber se o estoque dá para a próxima peça."
               />
@@ -101,13 +102,13 @@ export function TelaMateriais({ navegacao }: { navegacao: Navegacao }) {
             className="botao principal largo gigante"
             onClick={() => navegacao.ir({ tela: 'agulha' })}
           >
-            <span aria-hidden="true">＋</span> Guardar uma agulha
+            <IconeMais /> Guardar uma agulha
           </button>
 
           <div style={{ marginTop: '1rem' }}>
             {agulhas.length === 0 ? (
               <Vazio
-                desenho="🪡"
+                desenho={<IconeGrande><IconeAgulha /></IconeGrande>}
                 titulo="Nenhuma agulha guardada"
                 texto="Anote as agulhas que você tem, com o número em milímetros. Ajuda na hora de comprar, para não repetir o que já existe na gaveta."
               />
@@ -172,10 +173,25 @@ export function TelaLinhaEditor({ id, navegacao }: { id?: string; navegacao: Nav
         <input type="text" value={linha.nome ?? ''} onChange={(e) => mudar({ nome: e.target.value })} />
       </Campo>
 
+      <Campo rotulo="Cor do fio" ajuda="O nome que você usa, e a cor de verdade ao lado">
+        <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'stretch' }}>
+          <input
+            type="text"
+            style={{ flex: 1 }}
+            value={linha.cor ?? ''}
+            onChange={(e) => mudar({ cor: e.target.value })}
+          />
+          <input
+            type="color"
+            aria-label="Escolher a cor do fio"
+            value={linha.corHex ?? '#9c3b4a'}
+            onChange={(e) => mudar({ corHex: e.target.value })}
+            style={{ width: '4.5rem', minHeight: 'var(--alvo)', padding: '0.25rem', cursor: 'pointer' }}
+          />
+        </div>
+      </Campo>
+
       <div className="campo-duplo">
-        <Campo rotulo="Cor">
-          <input type="text" value={linha.cor ?? ''} onChange={(e) => mudar({ cor: e.target.value })} />
-        </Campo>
         <Campo rotulo="Lote" ajuda="Vem na etiqueta">
           <input type="text" value={linha.lote ?? ''} onChange={(e) => mudar({ lote: e.target.value })} />
         </Campo>

@@ -6,3 +6,4 @@ dist-ssr
 *.tsbuildinfo
 dist-artefato
 artefato
+.impeccable/review

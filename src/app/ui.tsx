@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { repositorio, useFoto } from '../dados/repositorio'
+import { IconeVoltar } from './icones'
 
 export function Cabecalho({
   titulo,
@@ -14,7 +15,7 @@ export function Cabecalho({
     <header className="cabecalho">
       {aoVoltar && (
         <button className="botao contorno" onClick={aoVoltar}>
-          <span aria-hidden="true">←</span> Voltar
+          <IconeVoltar /> Voltar
         </button>
       )}
       <h1>{titulo}</h1>
@@ -144,7 +145,8 @@ export function Vazio({
   texto,
   children,
 }: {
-  desenho: string
+  /** Ícone desenhado, do mesmo traço das abas. */
+  desenho: ReactNode
   titulo: string
   texto: string
   children?: ReactNode

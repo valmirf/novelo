@@ -11,6 +11,7 @@ import {
 } from '../dados/repositorio'
 import { novoId, type Projeto, type StatusProjeto } from '../nucleo/tipos'
 import { contarTamanhos, nomesDeTamanhos } from '../nucleo/tamanhos'
+import { IconeGrande, IconeMais, IconeTrabalhos } from './icones'
 import { formatarDuracao } from './ganchos'
 import { Aviso, Cabecalho, Campo, Confirmacao, Escolha, Miniatura, SeletorFoto, Vazio } from './ui'
 
@@ -28,13 +29,13 @@ export function TelaProjetos({ navegacao }: { navegacao: Navegacao }) {
       <Cabecalho titulo="Meus trabalhos" />
 
       <button className="botao principal largo gigante" onClick={() => navegacao.ir({ tela: 'projeto' })}>
-        <span aria-hidden="true">＋</span> Começar um trabalho novo
+        <IconeMais /> Começar um trabalho novo
       </button>
 
       <div style={{ marginTop: '1.2rem' }}>
         {projetos.length === 0 ? (
           <Vazio
-            desenho="🧶"
+            desenho={<IconeGrande><IconeTrabalhos /></IconeGrande>}
             titulo="Nenhum trabalho começado"
             texto="Um trabalho é a peça que você está fazendo agora. Ele guarda em que carreira você parou, quanto tempo já levou e qual linha está usando."
           />
