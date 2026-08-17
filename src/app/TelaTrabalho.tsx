@@ -408,37 +408,6 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
           </>
         )}
 
-        {/*
-          O sulco: quanto da peça já foi. Ela vê o avanço sem ler número, e o
-          número fica do lado porque comprimento sozinho não é sinal suficiente.
-        */}
-        {!semReceita && linhas.length > 0 && (
-          <div className="sulco">
-            <div
-              className="sulco-trilho"
-              role="progressbar"
-              aria-valuemin={1}
-              aria-valuemax={linhas.length}
-              aria-valuenow={posicao + 1}
-              aria-label="Quanto da peça já foi trabalhado"
-            >
-              <div
-                className="sulco-feito"
-                style={{ transform: `scaleX(${(posicao + 1) / linhas.length})` }}
-              />
-            </div>
-            <span className="sulco-conta">
-              {posicao + 1} de {linhas.length}
-              {/* Quanto falta, em palavra: comprimento sozinho não é sinal. */}
-              <small>
-                {linhas.length - posicao - 1 === 0
-                  ? 'última'
-                  : `faltam ${linhas.length - posicao - 1}`}
-              </small>
-            </span>
-          </div>
-        )}
-
         <div className="contadores">
           <div className="contador">
             <div className="nome">Carreiras</div>
@@ -549,6 +518,37 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
       </div>
 
       <footer className="trabalho-rodape">
+        {/*
+          O sulco mora no rodapé fixo, não no corpo rolável: no celular ele
+          caía abaixo da dobra justo quando o puxador passou a ocupar a largura
+          toda, e progresso que exige rolagem não é progresso de relance.
+        */}
+        {!semReceita && linhas.length > 0 && (
+          <div className="sulco">
+            <div
+              className="sulco-trilho"
+              role="progressbar"
+              aria-valuemin={1}
+              aria-valuemax={linhas.length}
+              aria-valuenow={posicao + 1}
+              aria-label="Quanto da peça já foi trabalhado"
+            >
+              <div
+                className="sulco-feito"
+                style={{ transform: `scaleX(${(posicao + 1) / linhas.length})` }}
+              />
+            </div>
+            <span className="sulco-conta">
+              {posicao + 1} de {linhas.length}
+              <small>
+                {linhas.length - posicao - 1 === 0
+                  ? 'última'
+                  : `faltam ${linhas.length - posicao - 1}`}
+              </small>
+            </span>
+          </div>
+        )}
+
         <div className="cronometro">
           <div>
             <div className="suave">Nesta sessão</div>
