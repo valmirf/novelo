@@ -91,6 +91,49 @@ só existia no manifesto do PWA, então a pessoa usava o app sem nunca ver o nom
   creme e terracota do mundo antigo, e a gaveta inteira com puxador embaixo, que
   no tamanho de ícone lia como **televisão com pé**.
 
+## Tokens
+
+Auditoria de cobertura feita sobre o arquivo, não estimada.
+
+| Categoria | Antes | Depois |
+|---|---|---|
+| Cor | 20 tokens + **13 hex soltos** no corpo do arquivo | 29 tokens, **zero hex solto** |
+| Espaço | nenhum token, **26 valores distintos** | 10 degraus, 15 valores |
+| Movimento | nenhum token, 3 durações e 2 saídas cruas | 4 tokens |
+| Raio / alvo | `--raio`, `--raio-gaveta`, `--alvo` | iguais |
+
+Dois defeitos que a auditoria achou:
+
+1. **O mesmo papel semântico tinha duas cores.** Tinta sobre papel de alerta era
+   `#6b4a10` num lugar e `#5c3f0d` noutro; sobre papel de acerto, `#1c4a2b` e
+   `#1b4529`. Consolidados no valor de maior contraste dos dois.
+2. **A palavra no botão de apagar tinha 3,69:1** — abaixo do piso do próprio
+   app. Passou a usar `--erro-papel`, que já existia e dá 5,97:1.
+
+A escala de espaço saiu do que o arquivo já usava, não de uma razão inventada:
+`1rem`, `0.85`, `0.7`, `0.6`, `0.5` e `0.4` concentravam metade das
+declarações. Os 11 valores restantes eram vizinhos a 1 ou 2px — ruído — e foram
+recolhidos ao degrau mais próximo. Conferido por impressão digital de layout
+(`testes/impressao.mjs`): 66 caixas se moveram, **nenhuma mais de 3px**, e
+nenhuma caixa apareceu ou sumiu.
+
+**Dívida em aberto:** 92 `style={{}}` embutidos nas telas carregam decisões de
+espaço que deveriam vir do sistema. Não foram migrados — cada um é uma decisão
+local e migrar em massa sem olhar cada caso trocaria um problema por outro.
+
+## Componente: Miniatura
+
+A foto do item numa lista.
+
+| Estado | Visual | Por quê |
+|---|---|---|
+| Com foto | a imagem, recortada na moldura | — |
+| **Sem foto** | a moldura com o ícone da seção, apagado a 55% | Guarda o lugar. Numa lista em que alguns itens têm foto e outros não, sumir com a moldura faz cada cartão começar num lugar diferente e a lista perde o prumo. |
+
+O desenho do vazio vem de fora (`vazia={<IconeAmostras />}`), para cada lista
+mostrar o seu. É decoração e vai `aria-hidden`: o cartão já diz por escrito o
+que é.
+
 ## Piso de acessibilidade (inegociável)
 
 Confirmado pelo usuário e medido, não estimado:

@@ -132,7 +132,11 @@ export function TelaMateriais({ navegacao }: { navegacao: Navegacao }) {
                   onClick={() => navegacao.ir({ tela: 'linha', id: linha.id })}
                 >
                   <div className="cartao-linha">
-                    <Miniatura fotoId={linha.fotoId} alt={`Foto da linha ${linha.nome}`} />
+                    <Miniatura
+                      fotoId={linha.fotoId}
+                      alt={`Foto da linha ${linha.nome}`}
+                      vazia={<IconeMateriais />}
+                    />
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div className="cartao-titulo">
                         {linha.marca} {linha.nome}
@@ -225,7 +229,11 @@ export function TelaMateriais({ navegacao }: { navegacao: Navegacao }) {
                     onClick={() => navegacao.ir({ tela: 'amostra', id: amostra.id })}
                   >
                     <div className="cartao-linha">
-                      <Miniatura fotoId={amostra.fotoId} alt={`Foto da amostra ${amostra.nome}`} />
+                      <Miniatura
+                        fotoId={amostra.fotoId}
+                        alt={`Foto da amostra ${amostra.nome}`}
+                        vazia={<IconeAmostras />}
+                      />
                       <div style={{ minWidth: 0, flex: 1 }}>
                         <div className="cartao-titulo">{amostra.nome}</div>
                         <div className="suave">

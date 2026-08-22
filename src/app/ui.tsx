@@ -304,10 +304,33 @@ export function SeletorFoto({
   )
 }
 
-export function Miniatura({ fotoId, alt }: { fotoId?: string; alt: string }) {
+/**
+ * A foto do item na lista.
+ *
+ * O estado vazio existe de propósito e ocupa o mesmo lugar da foto: numa lista
+ * em que alguns itens têm foto e outros não, sumir com a moldura faz cada
+ * cartão começar num lugar diferente e a lista perde o prumo. Antes o vazio era
+ * uma moldura escura e muda; agora carrega, apagado, o mesmo desenho da seção —
+ * é decoração e vai escondida do leitor de tela, porque o cartão já diz por
+ * escrito o que é.
+ */
+export function Miniatura({
+  fotoId,
+  alt,
+  vazia,
+}: {
+  fotoId?: string
+  alt: string
+  /** Desenho mostrado quando não há foto. Use o ícone da própria seção. */
+  vazia?: ReactNode
+}) {
   const url = useFoto(fotoId)
-  if (!url) return <div className="miniatura" aria-hidden="true" />
-  return <img className="miniatura" src={url} alt={alt} />
+  if (url) return <img className="miniatura" src={url} alt={alt} />
+  return (
+    <div className="miniatura sem-foto" aria-hidden="true">
+      {vazia}
+    </div>
+  )
 }
 
 async function reduzirImagem(arquivo: File, maximo = 1400): Promise<Blob> {

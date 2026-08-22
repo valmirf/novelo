@@ -45,7 +45,11 @@ export function TelaProjetos({ navegacao }: { navegacao: Navegacao }) {
           {projetos.map((projeto) => (
             <div key={projeto.id} className="cartao">
               <div className="cartao-linha">
-                <Miniatura fotoId={projeto.fotoId} alt={`Foto de ${projeto.nome}`} />
+                <Miniatura
+                  fotoId={projeto.fotoId}
+                  alt={`Foto de ${projeto.nome}`}
+                  vazia={<IconeTrabalhos />}
+                />
                 <div style={{ minWidth: 0, flex: 1 }}>
                   <div className="cartao-titulo">{projeto.nome}</div>
                   <div>
