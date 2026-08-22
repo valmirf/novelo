@@ -205,6 +205,23 @@ acendendo, e some só o deslize da gaveta e o afundar do botão sob o dedo.
 Além dele, dois movimentos utilitários: o afundar de 120ms do botão sob o dedo e
 o acender da sombra que diz "tem mais embaixo".
 
+## O que os testes já corrigiram no desenho
+
+A suíte de navegador alcança tudo por papel e por palavra visível, nunca por
+classe de CSS. Isso não é higiene de teste: se um elemento não pode ser achado
+pelo nome que mostra, quem usa leitor de tela também não o acha. Três mudanças
+de interface saíram daí, e não de gosto:
+
+- **`aria-valuetext` na barra de progresso.** Só com `aria-valuenow`, o leitor
+  de tela anunciava uma porcentagem; agora diz "Carreira 5 de 39, faltam 34",
+  igual ao que está escrito ao lado.
+- **O rótulo da carreira virou `<h2>`.** Ele sempre foi o título da instrução
+  que vem abaixo; agora quem navega por cabeçalhos pula direto para ele.
+- **Os botões do cartão dizem qual trabalho.** "Continuar" se repetia em todos
+  os cartões; o rótulo acessível passou a carregar o nome da peça. O botão do
+  relógio virou "Retomar", que também desfaz a ambiguidade de dois "Continuar"
+  com sentidos diferentes no mesmo app.
+
 ## Teto não alcançado
 
 Registrado honestamente para quem continuar: nada é de fato **gravado** (o

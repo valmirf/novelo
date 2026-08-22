@@ -46,8 +46,16 @@ empurrando a página para fora da tela.
 grava a caixa de cada elemento em número — comparar dois arquivos destes prova
 que uma mudança de sistema não mexeu no que já estava certo.
 
-## Um aviso
+## Um aviso sobre a porta 4173
 
-Os scripts auxiliares usam a porta 4173. Se um `vite preview` antigo tiver
-ficado rodando nela, os testes conversam com um pacote velho e reprovam por
-motivo errado. `lsof -ti:4173 | xargs kill -9` resolve.
+O Playwright constrói e sobe o próprio servidor em 4173, e está configurado para
+**nunca reaproveitar** um que já esteja de pé. Reaproveitar parece economia e é
+armadilha: um `vite preview` esquecido na porta serve um pacote antigo, e a
+suíte inteira reprova apontando defeitos que já foram corrigidos.
+
+Se a subida do servidor der tempo esgotado, quase sempre é um processo velho
+segurando a porta:
+
+```
+pkill -f "vite preview"
+```
