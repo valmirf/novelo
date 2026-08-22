@@ -8,7 +8,16 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState } from 'react'
 import { AJUSTES_PADRAO, banco } from './banco'
 import { agora, novoId } from '../nucleo/tipos'
-import type { Agulha, Ajustes, Base, Foto, Linha, Projeto, Receita } from '../nucleo/tipos'
+import type {
+  Agulha,
+  AmostraSalva,
+  Ajustes,
+  Base,
+  Foto,
+  Linha,
+  Projeto,
+  Receita,
+} from '../nucleo/tipos'
 
 /** Enquanto não existe conta, tudo pertence a este dono. */
 export const DONO_LOCAL = 'local'
@@ -63,6 +72,7 @@ export const repositorio = {
   projetos: colecao<Projeto>(banco.projetos, (p) => p.nome),
   linhas: colecao<Linha>(banco.linhas, (l) => `${l.marca} ${l.nome} ${l.cor}`),
   agulhas: colecao<Agulha>(banco.agulhas, (a) => `${a.tipo} ${String(a.numero).padStart(5, '0')}`),
+  amostras: colecao<AmostraSalva>(banco.amostras, (a) => a.nome),
 
   fotos: {
     async guardar(arquivo: Blob): Promise<string> {
@@ -134,6 +144,15 @@ export function useLinhas(): Linha[] {
 export function useAgulhas(): Agulha[] {
   const lista = useLiveQuery(() => banco.agulhas.toArray(), [])
   return vivos(lista, (a) => `${a.tipo} ${String(a.numero).padStart(5, '0')}`)
+}
+
+export function useAmostras(): AmostraSalva[] {
+  const lista = useLiveQuery(() => banco.amostras.toArray(), [])
+  return vivos(lista, (a) => a.nome)
+}
+
+export function useAmostra(id?: string): AmostraSalva | undefined {
+  return useLiveQuery(async () => (id ? banco.amostras.get(id) : undefined), [id])
 }
 
 export function useAjustes(): Ajustes {

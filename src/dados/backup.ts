@@ -5,9 +5,14 @@
 
 import { banco } from './banco'
 import { agora } from '../nucleo/tipos'
-import type { Agulha, Ajustes, Linha, Projeto, Receita } from '../nucleo/tipos'
+import type { Agulha, AmostraSalva, Ajustes, Linha, Projeto, Receita } from '../nucleo/tipos'
 
-const FORMATO = 1
+/**
+ * 2 acrescentou a biblioteca de amostras. Uma versão antiga do app recusa este
+ * arquivo com recado claro em vez de importar pela metade e perder as amostras
+ * calada — perder dado em silêncio é pior que recusar.
+ */
+const FORMATO = 2
 
 interface FotoExportada {
   id: string
@@ -28,16 +33,18 @@ export interface ArquivoBackup {
   projetos: Projeto[]
   linhas: Linha[]
   agulhas: Agulha[]
+  amostras: AmostraSalva[]
   fotos: FotoExportada[]
   ajustes?: Ajustes
 }
 
 export async function gerarBackup(): Promise<ArquivoBackup> {
-  const [receitas, projetos, linhas, agulhas, fotos, ajustes] = await Promise.all([
+  const [receitas, projetos, linhas, agulhas, amostras, fotos, ajustes] = await Promise.all([
     banco.receitas.toArray(),
     banco.projetos.toArray(),
     banco.linhas.toArray(),
     banco.agulhas.toArray(),
+    banco.amostras.toArray(),
     banco.fotos.toArray(),
     banco.ajustes.get('unico'),
   ])
@@ -63,6 +70,7 @@ export async function gerarBackup(): Promise<ArquivoBackup> {
     projetos,
     linhas,
     agulhas,
+    amostras,
     fotos: fotosExportadas,
     ajustes: ajustes ?? undefined,
   }
@@ -107,6 +115,7 @@ export interface ResultadoImportacao {
   projetos: number
   linhas: number
   agulhas: number
+  amostras: number
   fotos: number
 }
 
@@ -129,12 +138,20 @@ export async function importarBackup(texto: string): Promise<ResultadoImportacao
     throw new Error('Essa cópia foi feita numa versão mais nova do Novelo. Atualize o app primeiro.')
   }
 
-  const resultado: ResultadoImportacao = { receitas: 0, projetos: 0, linhas: 0, agulhas: 0, fotos: 0 }
+  const resultado: ResultadoImportacao = {
+    receitas: 0,
+    projetos: 0,
+    linhas: 0,
+    agulhas: 0,
+    amostras: 0,
+    fotos: 0,
+  }
 
   resultado.receitas = await juntar<Receita>(dados.receitas, banco.receitas)
   resultado.projetos = await juntar<Projeto>(dados.projetos, banco.projetos)
   resultado.linhas = await juntar<Linha>(dados.linhas, banco.linhas)
   resultado.agulhas = await juntar<Agulha>(dados.agulhas, banco.agulhas)
+  resultado.amostras = await juntar<AmostraSalva>(dados.amostras, banco.amostras)
 
   for (const foto of dados.fotos ?? []) {
     const existente = await banco.fotos.get(foto.id)

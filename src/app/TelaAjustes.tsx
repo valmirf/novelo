@@ -261,7 +261,8 @@ export function TelaAjustes() {
           <div style={{ marginTop: '0.8rem' }}>
             <Aviso tipo="tudo-certo">
               Cópia restaurada: {resultado.receitas} receitas, {resultado.projetos} trabalhos,{' '}
-              {resultado.linhas} linhas, {resultado.agulhas} agulhas e {resultado.fotos} fotos.
+              {resultado.linhas} linhas, {resultado.agulhas} agulhas, {resultado.amostras} amostras e{' '}
+              {resultado.fotos} fotos.
             </Aviso>
           </div>
         )}

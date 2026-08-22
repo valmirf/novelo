@@ -25,6 +25,47 @@ export interface Amostra {
   observacao?: string
 }
 
+/**
+ * Uma amostra guardada na biblioteca.
+ *
+ * É o registro de uma combinação que ela já testou: esta linha, com esta
+ * agulha, neste ponto, dá esta contagem em 10 cm. Serve para não refazer a
+ * mesma amostra duas vezes e para escolher a agulha certa antes de começar.
+ *
+ * A `Amostra` acima é só a medida solta que vive dentro de uma receita ou de um
+ * trabalho; esta é o registro completo, com material, blocagem e foto.
+ */
+export interface AmostraSalva extends Base {
+  /** Como ela chama esta amostra. Ex.: "Barroco com agulha 4". */
+  nome: string
+  tipo: TipoTrabalho
+  /** O ponto usado. Ex.: "ponto alto", "meia", "arroz". */
+  ponto?: string
+
+  /** Contagem em 10 cm, do jeito que saiu da agulha. */
+  pontos: number
+  carreiras: number
+
+  /** Linha do inventário. */
+  linhaId?: string
+  /** Quando a linha usada não está guardada nos materiais. */
+  linhaTexto?: string
+  agulhaId?: string
+  agulhaTexto?: string
+
+  /** Molhada e esticada para secar. Muda a contagem quase sempre. */
+  blocada: boolean
+  /** Só existe quando blocada: a contagem em 10 cm depois de blocar. */
+  pontosBlocada?: number
+  carreirasBlocada?: number
+  /** Só existe quando blocada: o tamanho da amostra depois de blocar, em cm. */
+  larguraBlocada?: number
+  alturaBlocada?: number
+
+  fotoId?: string
+  notas?: string
+}
+
 export interface Receita extends Base {
   titulo: string
   tipo: TipoTrabalho

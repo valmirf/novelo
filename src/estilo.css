@@ -521,6 +521,32 @@ button {
   flex-wrap: wrap;
 }
 
+/*
+  A tira que troca de seção dentro de uma tela. Três seções não cabem lado a
+  lado com a largura mínima de opção normal: quebravam para a linha de baixo e a
+  terceira esticava até virar uma barra do tamanho de um botão principal, logo
+  acima do botão principal de verdade. Grade de três colunas iguais, com a
+  contagem numa linha própria, aguenta qualquer tamanho de letra.
+*/
+.opcoes.secoes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.opcoes.secoes .opcao {
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.05rem;
+  padding: 0.5rem 0.3rem;
+}
+
+.opcoes.secoes .opcao small {
+  font-size: 0.8em;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
 .opcao {
   flex: 1;
   min-width: 7rem;
@@ -690,6 +716,14 @@ button {
 .aba {
   position: relative;
   flex: 1;
+  /*
+    Sem isto o item de flex se recusa a encolher abaixo do tamanho da palavra, e
+    no tamanho de letra "Maior" as quatro abas somavam 433px numa tela de 375px:
+    a barra estourava justamente para quem mais precisa da letra grande. O
+    rótulo é uma palavra só, então não adianta deixar quebrar — o teto em vw é
+    o que garante que TRABALHOS caiba em qualquer tela.
+  */
+  min-width: 0;
   min-height: 4rem;
   display: flex;
   flex-direction: column;
@@ -700,7 +734,7 @@ button {
   background: none;
   color: var(--sobre-madeira-suave);
   font-family: var(--gravado);
-  font-size: 0.76rem;
+  font-size: min(0.76rem, 3.1vw);
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -727,6 +761,23 @@ button {
   right: 18%;
   height: 2px;
   background: linear-gradient(90deg, transparent, var(--latao), transparent);
+}
+
+/*
+  A contagem da amostra no cartão. É o número que ela abre a biblioteca para
+  ver, então ganha corpo de leitura e algarismo tabular — contagem que dança de
+  largura entre cartões é contagem difícil de comparar.
+*/
+.contagem-amostra {
+  margin-top: 0.35rem;
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.contagem-amostra strong {
+  font-family: var(--gravado);
+  font-size: 1.15em;
+  color: var(--latao-brilho);
 }
 
 /* ------------------------------------------------------------ modo trabalho */

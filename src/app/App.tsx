@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useAjustes } from '../dados/repositorio'
 import { TelaProjetos, TelaProjetoEditor } from './TelaProjetos'
 import { TelaReceitas, TelaReceitaEditor } from './TelaReceitas'
-import { TelaMateriais, TelaLinhaEditor, TelaAgulhaEditor } from './TelaMateriais'
+import { TelaMateriais, TelaLinhaEditor, TelaAgulhaEditor, TelaAmostraEditor } from './TelaMateriais'
 import { TelaTrabalho } from './TelaTrabalho'
 import { TelaAjustes } from './TelaAjustes'
 import { AvisoAtualizacao, useAtualizacaoDisponivel } from './AvisoAtualizacao'
@@ -18,6 +18,7 @@ export type Rota =
   | { tela: 'receita'; id?: string }
   | { tela: 'linha'; id?: string }
   | { tela: 'agulha'; id?: string }
+  | { tela: 'amostra'; id?: string }
 
 export interface Navegacao {
   ir: (rota: Rota) => void
@@ -87,6 +88,7 @@ export function App() {
         {atual.tela === 'receita' && <TelaReceitaEditor id={atual.id} navegacao={navegacao} />}
         {atual.tela === 'linha' && <TelaLinhaEditor id={atual.id} navegacao={navegacao} />}
         {atual.tela === 'agulha' && <TelaAgulhaEditor id={atual.id} navegacao={navegacao} />}
+        {atual.tela === 'amostra' && <TelaAmostraEditor id={atual.id} navegacao={navegacao} />}
       </main>
 
       <nav className="abas" aria-label="Seções do aplicativo">

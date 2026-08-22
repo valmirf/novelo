@@ -116,7 +116,16 @@ Confirmado pelo usuário e medido, não estimado:
 - **`.cartao`** / **`.contador`** / **`.interruptor`** — frentes de gaveta.
   Elevação declarada **uma vez**: sombra, sem borda.
 - **`.abas`** — o rodapé do móvel. A gaveta aberta ganha latão, friso no topo e
-  a palavra em destaque.
+  a palavra em destaque. Quatro gavetas é o teto medido: no tamanho de letra
+  "Maior" a palavra TRABALHOS pede 114px e uma quinta aba deixaria 67px. O
+  rótulo tem teto em `vw` e `min-width: 0` justamente porque antes disso as
+  quatro já somavam 433px numa tela de 375px.
+- **`.opcoes.secoes`** — a tira que troca de seção dentro de uma tela. Grade de
+  três colunas iguais com a contagem em linha própria: em flex, três seções
+  quebravam e a terceira esticava até virar uma barra do tamanho de um botão
+  principal.
+- **`.contagem-amostra`** — o número que ela abre a biblioteca de amostras para
+  ver. Algarismo tabular, para comparar cartões sem a contagem dançar.
 - **`.aviso`** — papel enfiado na gaveta, com carimbo redondo à esquerda. Nunca
   barra de cor na lateral.
 
@@ -129,6 +138,13 @@ desenha o seu, e nenhum combina com o móvel.
 Registro de duas tentativas falhas: novelo com retas cruzadas e novelo com arcos
 **leem como sinal de proibido** no tamanho da aba. O ícone de Trabalhos virou
 amostra de ponto meia, que não tem essa ambiguidade.
+
+O ícone de Amostras é uma **régua**, e não um quadrado tricotado: o quadrado já
+é o de Trabalhos e, lado a lado, os dois viravam o mesmo desenho. Cinco
+candidatos foram desenhados e olhados a 26px antes de escolher — quadro com
+régua embaixo e quadro com régua ao lado leem como televisão com pé, régua na
+diagonal lê como seta de redimensionar, quadro com alfinetes nos cantos lê como
+dado, e a fita métrica enrolada vira um "S".
 
 ## Movimento
 

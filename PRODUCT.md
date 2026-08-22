@@ -111,3 +111,20 @@ Piso inegociável, confirmado pelo usuário neste redesenho:
 - confirmação por extenso antes de qualquer coisa irreversível.
 
 A beleza deve ser construída **dentro** dessas regras, não à custa delas.
+
+## Biblioteca de amostras
+
+Guarda a resposta de "com esta linha e esta agulha, quantos pontos cabem em 10
+cm?" — a conta que decide se a peça sai do tamanho certo. Cada registro tem a
+contagem, o material usado, se foi blocada e, quando foi, a contagem e o tamanho
+depois de blocar.
+
+Mora em Materiais e não em Receitas de propósito: a amostra é o resultado de uma
+**combinação de materiais** e é consultada antes de escolher a receita. Em
+Receitas ela encostaria na amostra que a receita exige — dois números diferentes
+com o mesmo nome, exatamente a confusão que o app existe para desfazer.
+
+Quando a amostra é blocada, é a contagem de depois que aparece no cartão: usar a
+de antes faz a peça sair errada. Marcada como blocada sem medida ainda não
+anotada, o cartão mostra a contagem de antes e escreve "Blocada, falta medir" —
+nunca inventar número continua sendo a regra.

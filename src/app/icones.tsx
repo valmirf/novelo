@@ -59,6 +59,27 @@ export function IconeMateriais() {
   )
 }
 
+/**
+ * Régua — a biblioteca de amostras.
+ *
+ * O quadro tricotado já é o ícone de Trabalhos, então a amostra não podia ser
+ * outro quadro: lado a lado na mesma tela, os dois viravam o mesmo desenho.
+ * A amostra é o ato de MEDIR, e a régua diz isso sem ambiguidade.
+ *
+ * Descartados por leitura errada no tamanho de aba: quadro com régua embaixo e
+ * quadro com régua ao lado leem como televisão com pé; régua na diagonal lê
+ * como seta de redimensionar; quadro com alfinetes nos cantos lê como dado; e a
+ * fita métrica enrolada vira um "S".
+ */
+export function IconeAmostras() {
+  return (
+    <svg {...comum}>
+      <rect x="2.5" y="8.6" width="19" height="6.8" rx="1.2" />
+      <path d="M6 8.6v2.9M9 8.6v1.9M12 8.6v2.9M15 8.6v1.9M18 8.6v2.9" />
+    </svg>
+  )
+}
+
 /** Puxador de gaveta — os ajustes do móvel. */
 export function IconeAjustes() {
   return (
