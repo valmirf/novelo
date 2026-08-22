@@ -193,8 +193,17 @@ dado, e a fita métrica enrolada vira um "S".
 
 Um momento autoral só: a gaveta que entra ao avançar a carreira
 (`gaveta-entra`, 260ms, desaceleração exponencial). A chave `key={posicao}` em
-`.carreira-atual` é o que faz o movimento reentrar a cada carreira. Silenciado
-por completo em `prefers-reduced-motion`.
+`.carreira-atual` é o que faz o movimento reentrar a cada carreira.
+
+Em `prefers-reduced-motion` **o movimento não é apagado, é trocado**. Antes era
+`animation: none !important` em tudo, o que matava junto o retorno de que a
+carreira mudou — e para quem trabalha com as duas mãos ocupadas, olhando de
+relance, esse aviso é o próprio produto. Agora a carreira nova aparece com um
+esmaecer curto de 160ms sem escorregar de lado, a sombra de rolagem continua
+acendendo, e some só o deslize da gaveta e o afundar do botão sob o dedo.
+
+Além dele, dois movimentos utilitários: o afundar de 120ms do botão sob o dedo e
+o acender da sombra que diz "tem mais embaixo".
 
 ## Teto não alcançado
 

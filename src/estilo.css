@@ -273,6 +273,7 @@ button {
   top: 0;
   z-index: 10;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.7rem;
   padding: 0.85rem 1rem;
@@ -283,7 +284,13 @@ button {
 }
 
 .cabecalho h1 {
-  flex: 1;
+  /*
+    A base em `rem` faz o título descer para uma linha própria quando ele e o
+    botão "Voltar" não cabem juntos. Numa tela de 320px no tamanho de letra
+    "Maior", sobravam 79px para uma palavra que pede 90 e o título empurrava a
+    página 43px para fora.
+  */
+  flex: 1 1 7rem;
   min-width: 0;
   font-family: var(--gravado);
   font-weight: 600;
@@ -515,7 +522,14 @@ img.miniatura {
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  white-space: nowrap;
+  /*
+    Sem `max-width` o selo empurrava a página inteira: "FAZENDO AGORA" no
+    tamanho de letra "Maior" mede 203px, e com `white-space: nowrap` ele
+    transbordava 11px para fora da tela num iPhone comum. Etiqueta de gaveta que
+    não cabe na gaveta quebra em duas linhas — sair do móvel, não.
+  */
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
 
 .selo.alerta {
@@ -1379,11 +1393,34 @@ img.miniatura {
   animation: gaveta-entra var(--tempo-gaveta) var(--saida-gaveta);
 }
 
+/*
+  Movimento reduzido: sai o deslocamento no espaço, fica o aviso.
+
+  Antes isto era `animation: none !important; transition: none !important` em
+  tudo. Matava junto o retorno de que a carreira mudou — e para quem trabalha
+  com as duas mãos ocupadas, olhando de relance, esse aviso é o próprio produto.
+  Quem pede movimento reduzido está pedindo que as coisas parem de se deslocar,
+  não que a interface pare de responder.
+
+  Fica: a carreira nova aparece com um esmaecer curto, sem escorregar de lado; a
+  sombra de rolagem continua acendendo e apagando. Sai: o deslize da gaveta e o
+  afundar do botão sob o dedo.
+*/
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
+  .carreira-atual {
+    animation: carreira-troca 160ms ease-out;
+  }
+
+  .botao:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+@keyframes carreira-troca {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
   }
 }
