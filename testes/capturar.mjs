@@ -40,7 +40,7 @@ await pagina.getByRole('button', { name: /Amostras/ }).click()
 await tirar('amostras')
 
 await pagina.getByRole('button', { name: /Trabalhos/ }).click()
-await pagina.getByRole('button', { name: /^Continuar$/ }).first().click()
+await pagina.getByRole('button', { name: /^Continuar / }).first().click()
 await pagina.waitForSelector('.carreira-atual')
 await tirar('trabalho')
 

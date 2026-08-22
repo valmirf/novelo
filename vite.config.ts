@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -50,4 +51,13 @@ export default defineConfig({
       },
     }),
   ],
+
+  /*
+    Vitest cuida do que é lógica pura em `src`; os testes de navegador em
+    `testes/e2e` são do Playwright e usam outro executor. Sem esta separação, o
+    `npm test` tentava rodar os dois e reprovava nos arquivos que não são dele.
+  */
+  test: {
+    include: ['src/**/*.test.ts'],
+  },
 })

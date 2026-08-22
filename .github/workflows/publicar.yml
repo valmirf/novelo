@@ -19,7 +19,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  construir:
+  # Os testes de navegador rodam contra o pacote construído, que é o mesmo
+  # arquivo que vai para o ar. Se algum passo aqui reprovar, nada é publicado —
+  # é uma peça de semanas do outro lado.
+  provar:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,6 +32,25 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run test:e2e
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-playwright
+          path: playwright-report
+          retention-days: 14
+
+  construir:
+    needs: provar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

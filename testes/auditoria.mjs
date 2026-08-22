@@ -114,7 +114,7 @@ for (const largura of [320, 390, 768]) {
       },
       trabalho: async () => {
         await pg.getByRole('button', { name: /Trabalhos/ }).click()
-        await pg.getByRole('button', { name: /^Continuar$/ }).first().click()
+        await pg.getByRole('button', { name: /^Continuar / }).first().click()
         await pg.waitForSelector('.carreira-atual')
       },
     }

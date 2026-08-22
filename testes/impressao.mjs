@@ -40,7 +40,7 @@ await pagina.waitForTimeout(200)
 telas.amostras = await medir()
 
 await pagina.getByRole('button', { name: /Trabalhos/ }).click()
-await pagina.getByRole('button', { name: /^Continuar$/ }).first().click()
+await pagina.getByRole('button', { name: /^Continuar / }).first().click()
 await pagina.waitForSelector('.carreira-atual')
 await pagina.waitForTimeout(200)
 telas.trabalho = await medir()

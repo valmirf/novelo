@@ -7,3 +7,9 @@ dist-ssr
 dist-artefato
 artefato
 .impeccable/review
+
+# Playwright e as ferramentas de conferência visual
+test-results
+playwright-report
+blob-report
+capturas

@@ -89,14 +89,73 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
     [leitura, projeto?.tamanho, quantosTamanhos],
   )
 
-  const posicao = projeto?.carreiraAtual ?? 0
+  /*
+   * A carreira que ela vê, que pode estar um passo à frente do banco.
+   *
+   * Gravar passa pelo IndexedDB e a leitura volta por outro caminho, com um
+   * intervalo curto no meio. Dois toques dentro desse intervalo eram calculados
+   * a partir do mesmo estado velho, os dois chegavam ao mesmo destino, e uma
+   * carreira sumia — num app em que perder a conta é perder a peça. Este avanço
+   * local é a verdade até o banco alcançá-lo.
+   */
+  const [avancoLocal, setAvancoLocal] = useState<Projeto | null>(null)
+  /*
+   * A mesma coisa numa referência, porque o React agrupa as atualizações de
+   * estado: cinco toques no mesmo quadro leriam todos o valor de antes do
+   * primeiro. A referência muda na hora; o estado existe só para a tela
+   * redesenhar.
+   */
+  const avancoRef = useRef<Projeto | null>(null)
+  const projetoVivo = avancoLocal ?? projeto
+
+  useEffect(() => {
+    if (avancoLocal && projeto && projeto.carreiraAtual === avancoLocal.carreiraAtual) {
+      avancoRef.current = null
+      setAvancoLocal(null)
+    }
+  }, [projeto, avancoLocal])
+
+  // Sair do trabalho zera a cópia local, senão ela vaza para a próxima peça.
+  useEffect(
+    () => () => {
+      avancoRef.current = null
+      setAvancoLocal(null)
+    },
+    [projetoId],
+  )
+
+  /*
+   * Gravação em fila de um lugar só.
+   *
+   * Cinco toques encostados disparavam cinco gravações concorrentes, cada uma
+   * lendo o registro antes de escrever — e a que chegasse por último ao banco
+   * mandava, mesmo carregando a carreira mais velha. Aqui só existe uma
+   * gravação por vez, e enquanto houver mudança nova ela grava de novo ao
+   * terminar. O último estado sempre vence, sem janela de perda.
+   */
+  const gravando = useRef(false)
+  const gravarAvanco = useCallback(async () => {
+    if (gravando.current) return
+    gravando.current = true
+    try {
+      let alvo = avancoRef.current
+      while (alvo) {
+        await repositorio.projetos.salvar(alvo)
+        alvo = avancoRef.current !== alvo ? avancoRef.current : null
+      }
+    } finally {
+      gravando.current = false
+    }
+  }, [])
+
+  const posicao = projetoVivo?.carreiraAtual ?? 0
   const atual = linhas[posicao]
   const proxima = linhas[posicao + 1]
 
   // Guarda o projeto numa referência para os atalhos de voz não ficarem presos
   // a um valor velho.
-  const projetoRef = useRef<Projeto | undefined>(projeto)
-  projetoRef.current = projeto
+  const projetoRef = useRef<Projeto | undefined>(projetoVivo)
+  projetoRef.current = projetoVivo
 
   const gravar = useCallback(async (mudancas: Partial<Projeto>) => {
     const base = projetoRef.current
@@ -190,7 +249,7 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
 
   const mover = useCallback(
     (passo: 1 | -1) => {
-      const base = projetoRef.current
+      const base = avancoRef.current ?? projetoRef.current
       if (!base || base.travado) return
 
       const limite = Math.max(linhas.length - 1, 0)
@@ -206,9 +265,13 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
 
       tocar()
       navigator.vibrate?.(passo === 1 ? 30 : [15, 40, 15])
-      void repositorio.projetos.salvar({ ...base, carreiraAtual: destino, contadores })
+
+      const adiantado = { ...base, carreiraAtual: destino, contadores }
+      avancoRef.current = adiantado
+      setAvancoLocal(adiantado)
+      void gravarAvanco()
     },
-    [linhas, tocar],
+    [linhas, tocar, gravarAvanco],
   )
 
   useComandoPorVoz(ajustes.comandoPorVoz, (comando) => mover(comando === 'avancar' ? 1 : -1))
@@ -305,7 +368,7 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
 
         {semReceita ? (
           <div className="carreira-atual">
-            <div className="rotulo">Carreira</div>
+            <h2 className="rotulo">Carreira</h2>
             <div style={{ fontSize: '4rem', fontWeight: 800, lineHeight: 1 }}>{posicao + 1}</div>
             <p className="suave" style={{ marginTop: '0.6rem' }}>
               {projeto.receitaId
@@ -320,7 +383,12 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
               novo. Sem ela, o movimento acontece uma vez só e some.
             */}
             <div className="carreira-atual" key={posicao}>
-              <div className="rotulo">
+              {/*
+                É cabeçalho de verdade, não um div enfeitado: esta linha titula
+                a instrução logo abaixo, e quem navega por cabeçalhos no leitor
+                de tela pula direto para ela.
+              */}
+              <h2 className="rotulo">
                 {atual.carreira.secao && <>{atual.carreira.secao} · </>}
                 <strong>Carreira {atual.numero}</strong>
                 {atual.carreira.lado && ` (${atual.carreira.lado})`}
@@ -332,7 +400,7 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
                     </strong>
                   </>
                 )}
-              </div>
+              </h2>
 
               {/*
                 Quando a contagem foi mesmo apurada, a versão expandida ajuda:
@@ -540,12 +608,22 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
         */}
         {!semReceita && linhas.length > 0 && (
           <div className="sulco">
+            {/*
+              O aria-valuetext existe porque, só com valuenow, o leitor de tela
+              anuncia uma porcentagem — que não é o que ela quer saber. Com ele,
+              anuncia a frase inteira, igual à que está escrita ao lado.
+            */}
             <div
               className="sulco-trilho"
               role="progressbar"
               aria-valuemin={1}
               aria-valuemax={linhas.length}
               aria-valuenow={posicao + 1}
+              aria-valuetext={`Carreira ${posicao + 1} de ${linhas.length}, ${
+                linhas.length - posicao - 1 === 0
+                  ? 'esta é a última'
+                  : `faltam ${linhas.length - posicao - 1}`
+              }`}
               aria-label="Quanto da peça já foi trabalhado"
             >
               <div
@@ -600,7 +678,7 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
               }
             }}
           >
-            {cronometro.rodando ? <><IconePausar /> Pausar</> : <><IconeRetomar /> Continuar</>}
+            {cronometro.rodando ? <><IconePausar /> Pausar</> : <><IconeRetomar /> Retomar</>}
           </button>
         </div>
 

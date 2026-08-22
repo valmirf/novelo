@@ -64,14 +64,21 @@ export function TelaProjetos({ navegacao }: { navegacao: Navegacao }) {
               </div>
 
               <div className="linha-botoes" style={{ marginTop: '0.9rem' }}>
+                {/*
+                  O nome da peça entra no rótulo acessível porque a palavra
+                  sozinha se repete em todos os cartões: quem ouve a tela em vez
+                  de ver precisa saber qual trabalho vai continuar.
+                */}
                 <button
                   className="botao principal"
+                  aria-label={`Continuar ${projeto.nome}`}
                   onClick={() => navegacao.ir({ tela: 'trabalho', id: projeto.id })}
                 >
                   Continuar
                 </button>
                 <button
                   className="botao contorno"
+                  aria-label={`Detalhes de ${projeto.nome}`}
                   onClick={() => navegacao.ir({ tela: 'projeto', id: projeto.id })}
                 >
                   Detalhes
