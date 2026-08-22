@@ -156,6 +156,13 @@
 html {
   font-size: calc(20px * var(--escala));
   background: var(--madeira);
+  /*
+    Serifa clara sobre fundo escuro engorda com a suavização subpixel do macOS.
+    Como toda a leitura do app é texto claro sobre madeira, ligar o antialias em
+    escala de cinza deixa a Petrona com o peso que ela foi desenhada para ter.
+  */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
@@ -204,6 +211,21 @@ h3 {
 
 p {
   margin: 0 0 0.7rem;
+}
+
+/*
+  Impede a última linha sozinha com uma palavra só. A tela de amostra vazia
+  quebrava em "Nenhuma / amostra guardada": órfã é leitura tropeçada, e aqui a
+  leitura é o produto. Fora de texto longo, onde a regra atrapalha mais do que
+  ajuda.
+*/
+p,
+.suave,
+.ajuda,
+.cartao-titulo,
+.vazio p,
+.carreira-atual .instrucao {
+  text-wrap: pretty;
 }
 
 /* As superfícies que não desenhei ainda carregam o mundo. */
@@ -464,6 +486,16 @@ button {
   background: var(--madeira-baixa);
   border: 1px solid var(--latao-fosco);
   flex-shrink: 0;
+}
+
+/*
+  A moldura é de latão porque é moldura de armário, e isso é escolha. Mas a
+  aresta encostada na imagem é branca a 12%, não latão: tingir a borda de uma
+  foto com a cor da marca joga um véu quente na foto do trabalho dela.
+*/
+img.miniatura {
+  outline: 1px solid rgba(255, 255, 255, 0.12);
+  outline-offset: -1px;
 }
 
 .suave {
@@ -1182,6 +1214,36 @@ button {
 }
 
 /* --------------------------------------------------------------- o puxador */
+
+/*
+  A sombra que diz "tem mais embaixo".
+
+  A área de leitura rola, e o corte no limite dela caía no meio da palavra — "1
+  pa em cada ponto. (135" — com uma linha reta que lê como defeito de tela, não
+  como continuação. O rodapé passa a desenhar uma sombra curta por cima do
+  corte, e só quando há mesmo conteúdo abaixo; parada no fim da rolagem, ela
+  some, porque aí não há nada que ela devesse anunciar.
+*/
+.trabalho-rodape {
+  position: relative;
+}
+
+.trabalho-rodape::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  height: 2.2rem;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(to top, var(--madeira), transparent);
+  transition: opacity var(--tempo-toque) var(--saida-toque);
+}
+
+.trabalho-rodape.tem-mais::before {
+  opacity: 1;
+}
 
 .trabalho-rodape {
   flex-shrink: 0;

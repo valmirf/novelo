@@ -7,7 +7,14 @@ import { marcarRepeticoes } from '../nucleo/repeticoes'
 import { IconeAvancar, IconePausar, IconeRetomar, IconeVoltar } from './icones'
 import { aplicarTamanho, contarTamanhos, dependeDoTamanho, nomesDeTamanhos } from '../nucleo/tamanhos'
 import { novoId, type Contador, type Lembrete, type Projeto } from '../nucleo/tipos'
-import { formatarDuracao, useComandoPorVoz, useCronometro, useSom, useTelaAcesa } from './ganchos'
+import {
+  formatarDuracao,
+  useComandoPorVoz,
+  useCronometro,
+  useSom,
+  useTelaAcesa,
+  useTemMaisAbaixo,
+} from './ganchos'
 import { Aviso, Campo, Confirmacao } from './ui'
 
 export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; navegacao: Navegacao }) {
@@ -22,6 +29,9 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
   const [confirmandoZerar, setConfirmandoZerar] = useState(false)
 
   useTelaAcesa(ajustes.telaSempreAcesa)
+
+  // A sombra em cima do rodapé só aparece quando há mesmo mais o que ver.
+  const { prender: prenderCorpo, temMais: temMaisAbaixo } = useTemMaisAbaixo()
 
   /*
    * O acento desta peça é a cor do fio que ela cadastrou — o app não impõe uma
@@ -248,7 +258,7 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
         <h1 style={{ fontSize: '1.1rem' }}>{projeto.nome}</h1>
       </header>
 
-      <div className="trabalho-corpo">
+      <div className="trabalho-corpo" ref={prenderCorpo}>
         {lembretesAgora.map((lembrete) => (
           <div key={lembrete.id} className="aviso atencao" style={{ display: 'block' }}>
             <div style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.5rem' }}>
@@ -522,7 +532,7 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
         </div>
       </div>
 
-      <footer className="trabalho-rodape">
+      <footer className={`trabalho-rodape${temMaisAbaixo ? ' tem-mais' : ''}`}>
         {/*
           O sulco mora no rodapé fixo, não no corpo rolável: no celular ele
           caía abaixo da dobra justo quando o puxador passou a ocupar a largura

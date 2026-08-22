@@ -205,3 +205,59 @@ export function formatarDuracao(segundos: number): string {
 export function formatarData(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
 }
+
+/**
+ * Diz se ainda há conteúdo abaixo do que está à vista numa área que rola.
+ *
+ * A tela de trabalho cortava a próxima carreira no meio da palavra — "1 pa em
+ * cada ponto. (135" — com um corte reto que lê como defeito, não como "tem mais
+ * embaixo". Com isto o rodapé desenha uma sombra suave por cima do corte, e só
+ * enquanto houver mesmo o que ver.
+ *
+ * Devolve uma referência por função, e não um `useRef`. A tela aparece primeiro
+ * no estado "ainda carregando", sem a área que rola; com `useRef` o efeito roda
+ * uma vez com a referência vazia e nunca mais, porque o objeto de referência
+ * não muda — foi exatamente esse o defeito da primeira versão. Guardar o
+ * elemento em estado faz o efeito rodar de novo quando ele enfim existe.
+ */
+export function useTemMaisAbaixo(): {
+  prender: (elemento: HTMLElement | null) => void
+  temMais: boolean
+} {
+  const [elemento, prender] = useState<HTMLElement | null>(null)
+  const [temMais, setTemMais] = useState(false)
+
+  useEffect(() => {
+    if (!elemento) return
+
+    const conferir = () => {
+      const sobra = elemento.scrollHeight - elemento.scrollTop - elemento.clientHeight
+      // Uma folga de 2px evita piscar por causa de arredondamento de zoom.
+      setTemMais(sobra > 2)
+    }
+
+    conferir()
+    elemento.addEventListener('scroll', conferir, { passive: true })
+
+    // O texto reflui quando a fonte hospedada termina de carregar, e aí a
+    // altura do conteúdo muda sem que ninguém mexa no DOM.
+    void document.fonts?.ready.then(conferir)
+
+    // A caixa muda de tamanho ao girar o aparelho ou ao mudar o tamanho da letra.
+    const observador = new ResizeObserver(conferir)
+    observador.observe(elemento)
+    for (const filho of elemento.children) observador.observe(filho)
+
+    // O conteúdo cresce quando a carreira muda ou um contador aparece.
+    const mutacoes = new MutationObserver(conferir)
+    mutacoes.observe(elemento, { childList: true, subtree: true, characterData: true })
+
+    return () => {
+      elemento.removeEventListener('scroll', conferir)
+      observador.disconnect()
+      mutacoes.disconnect()
+    }
+  }, [elemento])
+
+  return { prender, temMais }
+}
