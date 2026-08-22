@@ -70,7 +70,7 @@ test.describe('Piso de acessibilidade', () => {
       () => getComputedStyle(document.querySelector('.carreira-atual')!).animationName,
     )
     // Nem o deslize da gaveta, nem nada: um esmaecer que ainda avisa.
-    expect(animacao).not.toBe('gaveta-entra')
+    expect(animacao).not.toBe('carreira-entra')
     expect(animacao).not.toBe('none')
   })
 })

@@ -168,7 +168,7 @@ export function IconeGrande({ children }: { children: React.ReactNode }) {
   return (
     <span
       className="icone-grande"
-      style={{ display: 'inline-block', width: '3.6rem', height: '3.6rem', color: 'var(--latao-fosco)' }}
+      style={{ display: 'inline-block', width: '3.6rem', height: '3.6rem', color: 'var(--borda-forte)' }}
     >
       {children}
     </span>

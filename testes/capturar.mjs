@@ -9,12 +9,14 @@ import { semear } from './semente.mjs'
 
 const ENDERECO = process.env.NOVELO_URL ?? 'http://localhost:5173'
 const escala = Number(process.argv[2] ?? 1)
+const tema = process.argv[3] ?? 'light'
 const pasta = 'capturas'
 
 const navegador = await chromium.launch()
 const contexto = await navegador.newContext({
   viewport: { width: 390, height: 844 },
   deviceScaleFactor: 2,
+  colorScheme: tema,
 })
 const pagina = await contexto.newPage()
 await mkdir(pasta, { recursive: true })
@@ -26,7 +28,8 @@ await pagina.waitForSelector('.aba')
 await pagina.evaluate((e) => document.documentElement.style.setProperty('--escala', String(e)), escala)
 await pagina.waitForFunction(() => document.fonts.status === 'loaded')
 
-const sufixo = escala === 1 ? '' : `-${String(escala).replace('.', '_')}`
+const sufixo =
+  (escala === 1 ? '' : `-${String(escala).replace('.', '_')}`) + (tema === 'dark' ? '-escuro' : '')
 const tirar = async (nome) => {
   await pagina.waitForTimeout(350)
   await pagina.screenshot({ path: `${pasta}/${nome}${sufixo}.png` })

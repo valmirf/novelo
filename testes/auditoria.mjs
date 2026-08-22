@@ -31,7 +31,7 @@ const SONDA = `(() => {
       if (c && c[3] > 0.85) return c
       no = no.parentElement
     }
-    return [36, 26, 18]
+    return getComputedStyle(document.body).backgroundColor.match(/[\\d.]+/g).slice(0,3).map(Number)
   }
 
   const contraste = []
@@ -90,9 +90,15 @@ const SONDA = `(() => {
 const navegador = await chromium.launch()
 const relatorio = {}
 
+// O mundo tem dois temas e os dois são entregues à pessoa pelo aparelho dela.
+// Auditar só um seria auditar metade do produto.
+for (const tema of ['light', 'dark']) {
 for (const largura of [320, 390, 768]) {
   for (const escala of [1, 1.35]) {
-    const ctx = await navegador.newContext({ viewport: { width: largura, height: 780 } })
+    const ctx = await navegador.newContext({
+      viewport: { width: largura, height: 780 },
+      colorScheme: tema,
+    })
     const pg = await ctx.newPage()
     await pg.goto(ENDERECO)
     await semear(pg)
@@ -126,13 +132,14 @@ for (const largura of [320, 390, 768]) {
         await pg.evaluate((e) => document.documentElement.style.setProperty('--escala', String(e)), escala)
         await ir()
         await pg.waitForTimeout(280)
-        relatorio[`${nome} ${largura}px escala${escala}`] = await pg.evaluate(SONDA)
+        relatorio[`${tema} ${nome} ${largura}px escala${escala}`] = await pg.evaluate(SONDA)
       } catch (erro) {
-        relatorio[`${nome} ${largura}px escala${escala}`] = { erroDeNavegacao: String(erro).slice(0, 120) }
+        relatorio[`${tema} ${nome} ${largura}px escala${escala}`] = { erroDeNavegacao: String(erro).slice(0, 120) }
       }
     }
     await ctx.close()
   }
+}
 }
 
 // Resumo

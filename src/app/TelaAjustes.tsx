@@ -208,10 +208,10 @@ export function TelaAjustes() {
               minHeight: '8rem',
               marginTop: '0.7rem',
               padding: '0.6rem',
-              border: '2px solid var(--etiqueta-sombra)',
+              border: '2px solid var(--borda)',
               borderRadius: '0.7rem',
-              background: 'var(--etiqueta)',
-              color: 'var(--tinta)',
+              background: 'var(--superficie)',
+              color: 'var(--texto)',
               fontFamily: 'inherit',
               fontSize: '0.8rem',
             }}

@@ -74,7 +74,7 @@ export function ReceitaEmImagem({
             alt={ehPdf ? `Página ${pagina} da receita` : 'Receita'}
             style={{
               width: '100%',
-              border: '2px solid var(--latao-fosco)',
+              border: '2px solid var(--borda-forte)',
               borderRadius: '0.7rem',
               background: '#ffffff',
             }}

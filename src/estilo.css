@@ -1,31 +1,26 @@
 /*
-  O ARMARINHO — sistema visual do Novelo.
+  O mundo do Novelo: papel claro, marrom de barro, e o tema que a pessoa já
+  escolheu no aparelho.
 
-  O app é o armário dela. Estrutura em nogueira escura, número e puxador em
-  latão gravado, e o que ela precisa LER sempre sobre papel de etiqueta claro —
-  é assim que um armarinho funciona: o móvel é escuro, a etiqueta é clara.
+  Esta é a paleta original, restaurada a pedido depois de uma passagem pelo
+  "Armarinho" — nogueira escura com ferragem de latão. O que veio junto do
+  armarinho e não era cor ficou: as fontes hospedadas, a biblioteca de amostras,
+  o colchete de repetição, a sombra de rolagem e as correções de contraste e de
+  transbordo. Só a cor voltou.
 
-  A cena manda no claro/escuro: tricô acontece dentro de casa, muitas vezes à
-  noite sob abajur, em sessões longas. Fundo escuro cansa menos nessa luz. Mas
-  o texto que ela lê com a agulha na mão nunca fica sobre madeira: fica sobre
-  papel, com tinta quase preta. Contraste medido, não estimado.
+  Claro e escuro seguem o sistema. Quem tricota à noite sob abajur recebe o
+  escuro sem pedir, e quem tricota de dia recebe o claro — a decisão é do
+  aparelho dela, não minha.
 
-  Regras de acessibilidade continuam sendo o piso e a beleza é construída
-  dentro delas: corpo a partir de 20px, alvo de toque de 64px, contraste alto,
-  botão sempre com palavra, nada escondido atrás de gesto.
+  Regras de acessibilidade continuam sendo o piso: corpo a partir de 20px, alvo
+  de toque de 64px, contraste alto, botão sempre com palavra, nada escondido
+  atrás de gesto.
 */
 
 /*
-  As faces, hospedadas aqui dentro. Antes eram pilhas de sistema: em Apple
-  caíam em faces com caráter, mas em Android e Windows caíam em Georgia e
-  Roboto — e a voz gravada do armarinho deixava de existir para a maior parte
-  do mercado brasileiro. Duas faces variáveis, 55 KB somados, licença aberta.
-
-  Petrona (Impallari Type, Argentina): serifa de texto quente, feita para
-  leitura longa. É a que ela lê com a agulha na mão.
-
-  Archivo Narrow: grotesca estreita de sinalização, com terminais retos — a
-  letra de etiqueta de gaveta e de chapa gravada.
+  As faces, hospedadas aqui dentro. Antes eram pilhas de sistema: em Apple caíam
+  em faces com caráter, mas em Android e Windows caíam em Roboto. Duas faces
+  variáveis, 55 KB somados, licença aberta.
 */
 @font-face {
   font-family: 'Petrona';
@@ -43,63 +38,44 @@
   font-display: swap;
 }
 
-/* ------------------------------------------------------------------ mundo */
-
 :root {
   --escala: 1;
 
-  /* Estrutura: o móvel. */
-  --madeira: #241a12;
-  --madeira-alta: #33251a;
-  --madeira-baixa: #180f0a;
-  --veio: #0f0a06;
+  --fundo: #fdfaf6;
+  --superficie: #ffffff;
+  --superficie-2: #f4ece3;
+  --borda: #d9c9ba;
+  --borda-forte: #b39d8a;
 
-  /* Latão: número gravado, puxador, aba viva. Nunca em texto corrido. */
-  --latao: #d4a83c;
-  --latao-fosco: #8a6f2a;
-  --latao-brilho: #f0d68a;
+  --texto: #241a14;
+  --texto-suave: #5c4a3f;
 
-  /* Papel de etiqueta: onde toda leitura acontece. */
-  --etiqueta: #f2ece0;
-  --etiqueta-sombra: #ded5c4;
-  --tinta: #17110c;
-  --tinta-suave: #4a3d2f;
+  --marca: #7c4a3a;
+  --marca-clara: #f2e3dc;
+  --marca-texto: #ffffff;
+  /* Cor de texto sobre fundo claro da marca. No escuro, a marca não tem
+     contraste suficiente para servir de texto, então vira o texto comum. */
+  --acento-texto: #7c4a3a;
 
-  /* Sobre madeira, quando não há etiqueta. Medido em 12:1 e 7:1. */
-  --sobre-madeira: #f4efe6;
-  --sobre-madeira-suave: #c4b49c;
+  --alerta: #8a5000;
+  --alerta-fundo: #fdf0dc;
+  --erro: #a3271a;
+  --erro-fundo: #fbe6e3;
+  --certo: #2c6a41;
+  --certo-fundo: #e3f2e8;
+
 
   /*
-    Acento do trabalho. Vem da linha que ela cadastrou — o app não tem cor
-    própria de marca competindo com a cor do fio. Cor de novelo é o padrão até
-    ela escolher uma.
+    A cor da linha que ela cadastrou. O app não impõe cor de marca por cima do
+    material dela: TelaTrabalho troca este valor pela cor do fio do trabalho.
   */
   --fio: #9c3b4a;
-  --fio-claro: #c96b78;
 
-  /* Semânticos, cada um também com palavra ou forma na interface. */
-  --alerta: #b8801f;
-  --alerta-papel: #f7ecd4;
-  --erro: #a02b23;
-  --erro-papel: #f9e3e0;
-  --certo: #2f6b41;
-  --certo-papel: #e2f0e6;
+  --leitura: 'Petrona', Charter, 'Iowan Old Style', Georgia, serif;
+  --gravado: 'Archivo Narrow', 'Avenir Next Condensed', 'Helvetica Neue', sans-serif;
+  --medida: ui-monospace, 'SF Mono', Menlo, monospace;
 
-  --raio: 3px;
-  --raio-gaveta: 6px;
-  --alvo: 3.4rem;
-
-  /* Sombra de gaveta: deslocamento e desfoque de verdade, nunca halo. */
-  --sombra-gaveta: 0 2px 4px rgba(0, 0, 0, 0.45), 0 8px 20px rgba(0, 0, 0, 0.3);
-  --sombra-etiqueta: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 14px rgba(0, 0, 0, 0.28);
-
-
-  /*
-    Escala de espaço, tirada do que o arquivo já usava e não inventada por cima:
-    1rem, 0.85, 0.7, 0.6, 0.5 e 0.4 concentravam metade das declarações. Os
-    outros 11 valores eram vizinhos a 1 ou 2px de distância — ruído, não decisão
-    — e foram recolhidos para o degrau mais próximo.
-  */
+  /* Escala de espaço, tirada do que o arquivo já usava. */
   --espaco-1: 0.15rem;
   --espaco-2: 0.3rem;
   --espaco-3: 0.4rem;
@@ -109,44 +85,84 @@
   --espaco-7: 0.85rem;
   --espaco-8: 1rem;
   --espaco-9: 1.2rem;
-  --espaco-10: 1.75rem;
 
-  /*
-    Movimento. Um tempo curto para o que responde ao dedo e um tempo de gaveta
-    para o que entra na tela, cada um com a sua saída.
-  */
+  /* Um tempo curto para o que responde ao dedo, um tempo de entrada para o que
+     chega na tela. */
   --tempo-toque: 120ms;
-  --tempo-gaveta: 260ms;
+  --tempo-entrada: 260ms;
   --saida-toque: cubic-bezier(0.2, 0.9, 0.3, 1);
-  --saida-gaveta: cubic-bezier(0.16, 1, 0.3, 1);
+  --saida-entrada: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /*
-    Tinta sobre superfície colorida. Cada uma foi medida contra o seu próprio
-    fundo, não estimada. Antes viviam soltas no arquivo, e o mesmo papel
-    semântico aparecia com duas cores diferentes: alerta era #6b4a10 num lugar e
-    #5c3f0d noutro, acerto era #1c4a2b e #1b4529.
-  */
-  --sobre-latao: #2a1d08;      /* 7,4:1 sobre --latao */
-  --latao-aresta: #6d5620;
-  --tinta-alerta: #5c3f0d;     /* 8,2:1 sobre --alerta-papel */
-  --tinta-erro: #7a1f19;       /* 8,4:1 sobre --erro-papel */
-  --tinta-certo: #1b4529;      /* 9,2:1 sobre --certo-papel */
-  --tinta-fraca: #6d6053;      /* 5,2:1 sobre --etiqueta: texto de exemplo */
-  --tinta-rotulo: #6b5636;     /* 5,9:1 sobre --etiqueta: rótulo da etiqueta */
-  --etiqueta-funda: #e4dccb;   /* papel rebaixado, campo dentro da etiqueta */
-  --etiqueta-aresta: #c4b8a2;
-
-  /* Hospedadas: a voz é a mesma em qualquer aparelho. */
-  --leitura: 'Petrona', Charter, 'Iowan Old Style', Georgia, serif;
-  --gravado: 'Archivo Narrow', 'Avenir Next Condensed', 'Helvetica Neue', sans-serif;
-  --medida: ui-monospace, 'SF Mono', Menlo, monospace;
+  --raio: 1rem;
+  --alvo: 3.4rem;
+  --sombra: 0 1px 3px rgba(60, 40, 30, 0.12);
 }
 
 /*
-  O armarinho é um móvel escuro; não há versão clara dele. A interface se
-  compromete com um mundo só, e por isso não segue o tema do sistema — mas
-  pinta tudo explicitamente, para nunca herdar fundo de lugar nenhum.
+  Paleta escura. Ela aparece em duas situações e por isso está escrita duas
+  vezes: quando o sistema está no escuro e ninguém escolheu nada, e quando o
+  leitor escolheu escuro na mão. A repetição é chata mas CSS puro não deixa
+  compartilhar um bloco entre dois seletores diferentes.
 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --fundo: #1a1512;
+    --superficie: #262019;
+    --superficie-2: #332a22;
+    --borda: #4a3e33;
+    --borda-forte: #6d5c4c;
+
+    --texto: #f7f0e8;
+    --texto-suave: #d0bfae;
+
+    --marca: #e8a68d;
+    --marca-clara: #3d2b23;
+    --marca-texto: #241a14;
+    --acento-texto: #f7f0e8;
+
+    --alerta: #f2c078;
+    --alerta-fundo: #3b2e18;
+    --erro: #f2a196;
+    --erro-fundo: #3d201c;
+    --certo: #96d7ae;
+    --certo-fundo: #1d3527;
+
+    --fio: #c96b78;
+  
+    /* Serifa clara sobre fundo escuro engorda com a suavização subpixel. */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+:root[data-theme='dark'] {
+  --fundo: #1a1512;
+  --superficie: #262019;
+  --superficie-2: #332a22;
+  --borda: #4a3e33;
+  --borda-forte: #6d5c4c;
+
+  --texto: #f7f0e8;
+  --texto-suave: #d0bfae;
+
+  --marca: #e8a68d;
+  --marca-clara: #3d2b23;
+  --marca-texto: #241a14;
+  --acento-texto: #f7f0e8;
+
+  --alerta: #f2c078;
+  --alerta-fundo: #3b2e18;
+  --erro: #f2a196;
+  --erro-fundo: #3d201c;
+  --certo: #96d7ae;
+  --certo-fundo: #1d3527;
+
+  --fio: #c96b78;
+
+  /* Serifa clara sobre fundo escuro engorda com a suavização subpixel. */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
 * {
   box-sizing: border-box;
@@ -155,36 +171,16 @@
 
 html {
   font-size: calc(20px * var(--escala));
-  background: var(--madeira);
-  /*
-    Serifa clara sobre fundo escuro engorda com a suavização subpixel do macOS.
-    Como toda a leitura do app é texto claro sobre madeira, ligar o antialias em
-    escala de cinza deixa a Petrona com o peso que ela foi desenhada para ter.
-  */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   margin: 0;
-  color: var(--sobre-madeira);
-  background: var(--madeira);
-  /*
-    O veio da madeira: faixas verticais finas e irregulares, como as ripas de
-    um armário. Textura vem do mundo do assunto, não de um gradiente genérico.
-  */
-  background-image:
-    repeating-linear-gradient(
-      90deg,
-      transparent 0 37px,
-      rgba(0, 0, 0, 0.16) 37px 38px,
-      transparent 38px 61px,
-      rgba(255, 255, 255, 0.018) 61px 62px
-    ),
-    radial-gradient(120% 80% at 50% 0%, rgba(212, 168, 60, 0.05), transparent 60%);
+  background: var(--fundo);
+  color: var(--texto);
   font-family: var(--leitura);
   font-size: 1rem;
   line-height: 1.55;
+  /* Evita o zoom por dois toques comer a interface no iPhone. */
   touch-action: manipulation;
 }
 
@@ -192,58 +188,43 @@ h1,
 h2,
 h3 {
   margin: 0;
-  line-height: 1.2;
-  font-weight: 600;
+  line-height: 1.25;
+  font-weight: 700;
   text-wrap: balance;
 }
 
 h1 {
-  font-size: 1.5rem;
-  letter-spacing: -0.015em;
+  font-size: 1.6rem;
 }
 h2 {
-  font-size: 1.2rem;
-  letter-spacing: -0.01em;
+  font-size: 1.25rem;
 }
 h3 {
-  font-size: 1.02rem;
+  font-size: 1.05rem;
 }
 
 p {
-  margin: 0 0 0.7rem;
+  margin: 0 0 0.75rem;
 }
 
 /*
-  Impede a última linha sozinha com uma palavra só. A tela de amostra vazia
-  quebrava em "Nenhuma / amostra guardada": órfã é leitura tropeçada, e aqui a
-  leitura é o produto. Fora de texto longo, onde a regra atrapalha mais do que
-  ajuda.
+  Impede a última linha sozinha com uma palavra só. A tela vazia quebrava em
+  "Nenhuma / amostra guardada": órfã é leitura tropeçada, e aqui a leitura é o
+  produto.
 */
 p,
 .suave,
-.ajuda,
+.campo .ajuda,
 .cartao-titulo,
 .vazio p,
 .carreira-atual .instrucao {
   text-wrap: pretty;
 }
 
-/* As superfícies que não desenhei ainda carregam o mundo. */
-::selection {
-  background: var(--latao);
-  color: var(--madeira-baixa);
-}
-
+/* Foco sempre visível: quem navega por teclado precisa enxergar onde está. */
 :focus-visible {
-  outline: 3px solid var(--latao);
+  outline: 3px solid var(--marca);
   outline-offset: 3px;
-}
-
-input,
-textarea,
-select,
-button {
-  caret-color: var(--fio);
 }
 
 /* ---------------------------------------------------------------- estrutura */
@@ -254,20 +235,13 @@ button {
   flex-direction: column;
   max-width: 34rem;
   margin: 0 auto;
-  /* O corpo do armário: um pouco mais claro que a parede atrás. */
-  background: linear-gradient(180deg, var(--madeira-alta) 0%, var(--madeira) 22%);
-  box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
 }
 
 .conteudo {
   flex: 1;
-  padding: 1rem 1rem 7.5rem;
+  padding: 1rem 1rem 7rem;
 }
 
-/*
-  Cabeçalho como a testeira do armário: faixa escura com um fio de latão
-  embaixo, do jeito que o móvel tem um friso separando as gavetas.
-*/
 .cabecalho {
   position: sticky;
   top: 0;
@@ -275,40 +249,29 @@ button {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.7rem;
-  padding: 0.85rem 1rem;
-  padding-top: max(0.85rem, env(safe-area-inset-top));
-  background: linear-gradient(180deg, var(--madeira-alta), var(--madeira-baixa));
-  border-bottom: 1px solid var(--latao-fosco);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+  background: var(--fundo);
+  border-bottom: 2px solid var(--borda);
 }
 
+/*
+  A base em `rem` faz o título descer para uma linha própria quando ele e o
+  botão "Voltar" não cabem juntos. Numa tela de 320px no tamanho de letra
+  "Maior", sobravam 79px para uma palavra que pede 90.
+*/
 .cabecalho h1 {
-  /*
-    A base em `rem` faz o título descer para uma linha própria quando ele e o
-    botão "Voltar" não cabem juntos. Numa tela de 320px no tamanho de letra
-    "Maior", sobravam 79px para uma palavra que pede 90 e o título empurrava a
-    página 43px para fora.
-  */
   flex: 1 1 7rem;
   min-width: 0;
-  font-family: var(--gravado);
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--sobre-madeira);
 }
 
 /* ------------------------------------------------------------------- marca */
 
 /*
-  NOVELO em letra de latão aplicada na testeira do armário. A luz da cena vem
-  de cima, então a letra tem fio claro na aresta superior e sombra projetada
-  embaixo — é o que faz ler como metal preso na madeira, e não como texto
-  colorido de amarelo. Sem gradiente no glifo: a página não desenha metal
-  polido em lugar nenhum, então a marca também não finge.
-
-  Entreletra larga porque letra de placa é espaçada; caixa alta porque é
-  gravação, não frase.
+  NOVELO em condensada de sinalização, na cor de barro da marca. Sem sombra e
+  sem relevo: nesta paleta nada finge ser objeto, então a marca também não.
+  A entreletra larga é o que faz um nome curto ler como assinatura.
 */
 .marca {
   font-family: var(--gravado);
@@ -317,43 +280,24 @@ button {
   letter-spacing: 0.22em;
   /* Compensa a entreletra sobrando depois da última letra. */
   margin-right: -0.22em;
-  color: var(--latao);
-  text-shadow:
-    0 -1px 0 var(--latao-brilho),
-    0 2px 1px rgba(0, 0, 0, 0.55),
-    0 4px 8px rgba(0, 0, 0, 0.4);
+  color: var(--marca);
 }
 
-/* Dentro de texto corrido, a marca só muda de voz — não de tamanho nem de peso. */
 .marca.pequena {
   letter-spacing: 0.14em;
   margin-right: -0.14em;
   font-size: 0.94em;
-  text-shadow:
-    0 -1px 0 rgba(240, 214, 138, 0.55),
-    0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-/*
-  Rótulo da lista, agora que o nome do app ocupa a testeira. Voz de etiqueta
-  pequena, para nomear sem competir com o nome dos trabalhos.
-*/
+/* Rótulo da lista, já que o nome do app ocupa o cabeçalho da tela inicial. */
 .rotulo-lista {
   font-family: var(--gravado);
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  color: var(--sobre-madeira-suave);
+  color: var(--texto-suave);
   margin-bottom: 0.7rem;
-}
-
-/*
-  Ícone dentro de botão acompanha o peso da palavra ao lado: traço de 1.6 ao
-  lado de condensada 700 lê fino e pequeno demais.
-*/
-.botao svg {
-  stroke-width: 2.1;
 }
 
 /* ------------------------------------------------------------------ botões */
@@ -365,61 +309,44 @@ button {
   gap: 0.5rem;
   min-height: var(--alvo);
   padding: 0.6rem 1.1rem;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
   border-radius: var(--raio);
-  background: var(--madeira-alta);
-  color: var(--sobre-madeira);
-  font-family: var(--gravado);
+  background: var(--superficie-2);
+  color: var(--texto);
+  font-family: inherit;
   font-size: 1rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
   text-align: center;
   cursor: pointer;
+}
+
+.botao {
   transition: transform var(--tempo-toque) var(--saida-toque);
 }
 
 .botao:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: scale(0.98);
 }
 
 .botao:disabled {
-  opacity: 0.42;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
-/*
-  O puxador de latão. É o botão que ela toca com a agulha na mão, então é o
-  objeto mais sólido da tela: metal escovado, aresta de luz em cima, sombra
-  embaixo.
-*/
-/*
-  Latão escovado, não polido. O gradiente vertical forte lia como botão de
-  cassino; metal de móvel tem variação curta e uma aresta de luz só em cima.
-*/
 .botao.principal {
-  background: var(--latao);
-  color: var(--sobre-latao);
-  /* A aresta gravada: um sulco escuro embaixo e luz na borda de cima. */
-  border-color: var(--latao-aresta);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 246, 214, 0.5),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.22),
-    0 2px 3px rgba(0, 0, 0, 0.42),
-    0 7px 16px rgba(0, 0, 0, 0.26);
-  font-weight: 700;
-  letter-spacing: 0.015em;
+  background: var(--marca);
+  color: var(--marca-texto);
 }
 
 .botao.contorno {
-  background: var(--madeira-alta);
-  border-color: var(--latao-fosco);
-  color: var(--sobre-madeira);
+  background: var(--superficie);
+  border-color: var(--borda-forte);
 }
 
 .botao.perigo {
-  background: var(--madeira-alta);
+  background: var(--erro-fundo);
+  color: var(--erro);
   border-color: var(--erro);
-  color: var(--erro-papel);
 }
 
 .botao.largo {
@@ -428,7 +355,7 @@ button {
 
 .botao.gigante {
   min-height: 5rem;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
 }
 
 .linha-botoes {
@@ -442,20 +369,15 @@ button {
   min-width: 8rem;
 }
 
-/* ------------------------------------------------------- gaveta (o cartão) */
+/* ------------------------------------------------------------------ cartões */
 
-/*
-  Cada item é a frente de uma gaveta: madeira um tom acima, friso de latão à
-  esquerda como o encaixe do puxador, sombra com deslocamento de verdade.
-*/
 .cartao {
-  position: relative;
-  background: linear-gradient(180deg, var(--madeira-alta), var(--madeira));
-  border: 0;
-  border-radius: var(--raio-gaveta);
+  background: var(--superficie);
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
   padding: 1rem;
   margin-bottom: 0.85rem;
-  box-shadow: var(--sombra-gaveta);
+  box-shadow: var(--sombra);
 }
 
 .cartao.clicavel {
@@ -463,7 +385,6 @@ button {
   width: 100%;
   text-align: left;
   font: inherit;
-  font-family: var(--leitura);
   color: inherit;
   cursor: pointer;
 }
@@ -472,124 +393,112 @@ button {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  font-family: var(--gravado);
   font-size: 1.15rem;
-  font-weight: 600;
-  color: var(--sobre-madeira);
+  font-weight: 700;
   margin-bottom: 0.3rem;
 }
 
 .cartao-linha {
   display: flex;
-  gap: 0.85rem;
+  gap: 0.8rem;
   align-items: center;
 }
 
 .miniatura {
   width: 4.5rem;
   height: 4.5rem;
-  border-radius: 3px;
+  border-radius: 0.7rem;
   object-fit: cover;
-  background: var(--madeira-baixa);
-  border: 1px solid var(--latao-fosco);
+  background: var(--superficie-2);
   flex-shrink: 0;
 }
 
 /*
-  A moldura é de latão porque é moldura de armário, e isso é escolha. Mas a
-  aresta encostada na imagem é branca a 12%, não latão: tingir a borda de uma
-  foto com a cor da marca joga um véu quente na foto do trabalho dela.
+  A moldura sem foto guarda o lugar. Numa lista em que alguns itens têm foto e
+  outros não, sumir com ela faz cada cartão começar num lugar diferente e a
+  lista perde o prumo.
 */
+.miniatura.sem-foto {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--borda-forte);
+}
+
+.miniatura.sem-foto svg {
+  width: 45%;
+  height: 45%;
+}
+
+/* Aresta neutra para a foto não se dissolver na superfície, sem tingi-la. */
 img.miniatura {
-  outline: 1px solid rgba(255, 255, 255, 0.12);
+  outline: 1px solid rgba(0, 0, 0, 0.1);
   outline-offset: -1px;
 }
 
 .suave {
-  color: var(--sobre-madeira-suave);
+  color: var(--texto-suave);
   font-size: 0.9rem;
 }
 
-/* Etiqueta de gaveta: papel claro, texto pequeno em caixa alta. */
 .selo {
   display: inline-block;
   padding: 0.15rem 0.6rem;
-  border-radius: 2px;
-  background: var(--etiqueta);
-  color: var(--tinta);
-  font-family: var(--gravado);
-  font-size: 0.78rem;
+  border-radius: 999px;
+  background: var(--marca-clara);
+  color: var(--acento-texto);
+  font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
   /*
-    Sem `max-width` o selo empurrava a página inteira: "FAZENDO AGORA" no
-    tamanho de letra "Maior" mede 203px, e com `white-space: nowrap` ele
-    transbordava 11px para fora da tela num iPhone comum. Etiqueta de gaveta que
-    não cabe na gaveta quebra em duas linhas — sair do móvel, não.
+    Sem teto de largura o selo empurrava a página inteira: "FAZENDO AGORA" no
+    tamanho de letra "Maior" mede 203px e transbordava a tela de um iPhone
+    comum. Selo que não cabe quebra em duas linhas — sair da tela, não.
   */
   max-width: 100%;
   overflow-wrap: break-word;
 }
 
 .selo.alerta {
-  background: var(--alerta-papel);
-  color: var(--tinta-alerta);
+  background: var(--alerta-fundo);
+  color: var(--alerta);
 }
 .selo.certo {
-  background: var(--certo-papel);
-  color: var(--tinta-certo);
+  background: var(--certo-fundo);
+  color: var(--certo);
 }
 
-/* --------------------------------------------------------------- formulário */
+/* ---------------------------------------------------------------- formulário */
 
 .campo {
   display: block;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.1rem;
 }
 
 .campo > span {
   display: block;
-  font-family: var(--gravado);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  font-size: 0.82rem;
-  color: var(--latao);
-  margin-bottom: 0.4rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
 }
 
 .campo .ajuda {
-  display: block;
-  font-family: var(--leitura);
   font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--sobre-madeira-suave);
-  font-size: 1rem;
-  margin-top: 0.15rem;
+  color: var(--texto-suave);
+  font-size: 0.85rem;
 }
 
-/* Campo preenchível é papel: ela escreve sobre papel, não sobre madeira. */
 .campo input,
 .campo select,
 .campo textarea {
   width: 100%;
   min-height: var(--alvo);
-  padding: 0.7rem 0.8rem;
-  border: 1px solid var(--etiqueta-sombra);
-  border-radius: 2px;
-  background: var(--etiqueta);
-  color: var(--tinta);
-  font-family: var(--leitura);
-  /* 1rem já passa de 16px: o iPhone não dá zoom ao focar. */
+  padding: 0.6rem 0.75rem;
+  border: 2px solid var(--borda-forte);
+  border-radius: 0.7rem;
+  background: var(--superficie);
+  color: var(--texto);
+  font-family: inherit;
+  /* 1rem aqui já passa de 16px, então o iPhone não dá zoom ao focar. */
   font-size: 1rem;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.18);
-}
-
-.campo input::placeholder,
-.campo textarea::placeholder {
-  color: var(--tinta-fraca);
 }
 
 .campo textarea {
@@ -604,6 +513,10 @@ img.miniatura {
   gap: 0.8rem;
 }
 
+.campo-duplo > * {
+  min-width: 0;
+}
+
 .opcoes {
   display: flex;
   gap: 0.5rem;
@@ -613,9 +526,7 @@ img.miniatura {
 /*
   A tira que troca de seção dentro de uma tela. Três seções não cabem lado a
   lado com a largura mínima de opção normal: quebravam para a linha de baixo e a
-  terceira esticava até virar uma barra do tamanho de um botão principal, logo
-  acima do botão principal de verdade. Grade de três colunas iguais, com a
-  contagem numa linha própria, aguenta qualquer tamanho de letra.
+  terceira esticava até virar uma barra do tamanho de um botão principal.
 */
 .opcoes.secoes {
   display: grid;
@@ -644,24 +555,20 @@ img.miniatura {
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  padding: 0.5rem 0.7rem;
-  border: 1px solid var(--latao-fosco);
-  border-radius: var(--raio);
-  background: var(--madeira-alta);
-  color: var(--sobre-madeira);
-  font-family: var(--gravado);
+  padding: 0.5rem;
+  border: 2px solid var(--borda-forte);
+  border-radius: 0.7rem;
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
   font-weight: 600;
-  font-size: 0.97rem;
   cursor: pointer;
 }
 
-/* Selecionado é gaveta puxada: latão sólido, e some a dúvida. */
 .opcao[aria-pressed='true'] {
-  background: var(--latao);
-  border-color: var(--latao-aresta);
-  color: var(--sobre-latao);
-  font-weight: 700;
-  box-shadow: inset 0 1px 0 rgba(255, 246, 214, 0.45), inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  background: var(--marca);
+  border-color: var(--marca);
+  color: var(--marca-texto);
 }
 
 .interruptor {
@@ -672,121 +579,66 @@ img.miniatura {
   width: 100%;
   min-height: var(--alvo);
   padding: 0.7rem 1rem;
-  border: 0;
-  border-radius: var(--raio-gaveta);
-  background: linear-gradient(180deg, var(--madeira-alta), var(--madeira));
-  color: var(--sobre-madeira);
-  font-family: var(--leitura);
-  font-size: 1rem;
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
   text-align: left;
   margin-bottom: 0.7rem;
   cursor: pointer;
-  box-shadow: var(--sombra-gaveta);
 }
 
 .interruptor .estado {
-  font-family: var(--gravado);
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  color: var(--latao);
+  color: var(--acento-texto);
   white-space: nowrap;
 }
 
 /* ------------------------------------------------------------------- avisos */
 
-/*
-  Aviso é papel enfiado na gaveta: fundo de papel, tinta escura, e uma barra
-  de cor à esquerda. Cor nunca é o único sinal — o texto sempre diz o que é.
-*/
-/*
-  Aviso é um papel enfiado na gaveta. A distinção vem do papel inteiro tingido
-  e do carimbo redondo à esquerda — não de uma barra de cor na lateral, que é o
-  tique mais batido de interface gerada por máquina.
-*/
 .aviso {
   display: flex;
-  align-items: flex-start;
-  gap: 0.7rem;
+  gap: 0.6rem;
   padding: 0.85rem 1rem;
-  border-radius: 2px;
-  border: 1px solid;
+  border-radius: var(--raio);
+  border: 2px solid;
   margin-bottom: 0.85rem;
-  font-family: var(--leitura);
-  font-size: 1rem;
-  line-height: 1.55;
-  box-shadow: var(--sombra-etiqueta);
-}
-
-/* O carimbo: círculo de tinta com o sinal dentro. */
-.aviso > span:first-child {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 1.5rem;
-  height: 1.5rem;
-  margin-top: 0.05rem;
-  border-radius: 50%;
-  border: 1.5px solid currentColor;
-  font-family: var(--gravado);
-  font-size: 0.88rem;
-  font-weight: 700;
-  line-height: 1;
+  font-size: 0.95rem;
 }
 
 .aviso.atencao {
-  background: var(--alerta-papel);
-  border-color: rgba(184, 128, 31, 0.5);
-  color: var(--tinta-alerta);
+  background: var(--alerta-fundo);
+  border-color: var(--alerta);
+  color: var(--alerta);
 }
 
 .aviso.problema {
-  background: var(--erro-papel);
-  border-color: rgba(160, 43, 35, 0.5);
-  color: var(--tinta-erro);
+  background: var(--erro-fundo);
+  border-color: var(--erro);
+  color: var(--erro);
 }
 
 .aviso.tudo-certo {
-  background: var(--certo-papel);
-  border-color: rgba(47, 107, 65, 0.5);
-  color: var(--tinta-certo);
+  background: var(--certo-fundo);
+  border-color: var(--certo);
+  color: var(--certo);
 }
 
 .vazio {
   text-align: center;
-  padding: 2.75rem 1rem;
-  color: var(--sobre-madeira-suave);
-}
-
-.vazio h2 {
-  color: var(--sobre-madeira);
-  margin-bottom: 0.5rem;
+  padding: 2.5rem 1rem;
+  color: var(--texto-suave);
 }
 
 .vazio .desenho {
+  font-size: 3.5rem;
   line-height: 1;
-  margin-bottom: 0.85rem;
+  margin-bottom: 0.75rem;
 }
 
-/*
-  O ícone da tela vazia é o mesmo traço da aba, num quadro maior. O desenho
-  precisa preencher o invólucro: sem isto ele fica no tamanho da aba dentro de
-  uma caixa grande, e some no meio da tela.
-*/
-.icone-grande svg {
-  width: 100%;
-  height: 100%;
-  stroke-width: 1.1;
-}
+/* --------------------------------------------------------------- abas de baixo */
 
-/* ------------------------------------------------------- trilho de gavetas */
-
-/*
-  A navegação é o rodapé do armário: quatro gavetas. A aberta ganha o latão e
-  um friso em cima, como a gaveta que se destaca do móvel.
-*/
 .abas {
   position: fixed;
   bottom: 0;
@@ -794,23 +646,19 @@ img.miniatura {
   right: 0;
   z-index: 20;
   display: flex;
-  background: linear-gradient(180deg, var(--madeira-baixa), var(--veio));
-  border-top: 1px solid var(--latao-fosco);
+  background: var(--superficie);
+  border-top: 2px solid var(--borda);
   padding-bottom: env(safe-area-inset-bottom);
   max-width: 34rem;
   margin: 0 auto;
-  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.45);
 }
 
 .aba {
-  position: relative;
   flex: 1;
   /*
-    Sem isto o item de flex se recusa a encolher abaixo do tamanho da palavra, e
-    no tamanho de letra "Maior" as quatro abas somavam 433px numa tela de 375px:
-    a barra estourava justamente para quem mais precisa da letra grande. O
-    rótulo é uma palavra só, então não adianta deixar quebrar — o teto em vw é
-    o que garante que TRABALHOS caiba em qualquer tela.
+    Sem `min-width` o item de flex se recusa a encolher abaixo do tamanho da
+    palavra, e no tamanho de letra "Maior" as quatro abas somavam 433px numa
+    tela de 375px. O teto em `vw` é o que garante que TRABALHOS caiba.
   */
   min-width: 0;
   min-height: 4rem;
@@ -818,74 +666,90 @@ img.miniatura {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.15rem;
+  gap: 0.1rem;
   border: none;
   background: none;
-  color: var(--sobre-madeira-suave);
+  color: var(--texto-suave);
   font-family: var(--gravado);
-  font-size: min(0.76rem, 3.1vw);
-  font-weight: 600;
+  font-size: min(0.8rem, 3.1vw);
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
-  padding: 0.5rem 0.15rem;
+  padding: 0.4rem 0.2rem;
 }
 
 .aba .simbolo {
-  font-size: 1.3rem;
+  font-size: 1.35rem;
   line-height: 1;
 }
 
 .aba[aria-current='page'] {
-  color: var(--latao-brilho);
-  background: linear-gradient(180deg, rgba(212, 168, 60, 0.14), transparent 70%);
+  color: var(--acento-texto);
+  background: var(--marca-clara);
 }
 
-/* O friso de latão da gaveta aberta. */
-.aba[aria-current='page']::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 18%;
-  right: 18%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--latao), transparent);
-}
+/* ------------------------------------------------------------ modo trabalho */
 
 /*
-  A contagem da amostra no cartão. É o número que ela abre a biblioteca para
-  ver, então ganha corpo de leitura e algarismo tabular — contagem que dança de
-  largura entre cartões é contagem difícil de comparar.
+  A tela de trabalho é uma moldura fixa: só o miolo rola. Assim o botão
+  "Próxima carreira" nunca sai da vista, que é o único botão que ela precisa
+  achar sem procurar, com a agulha na mão.
 */
-.contagem-amostra {
-  margin-top: 0.3rem;
-  font-size: 1.05rem;
-  font-variant-numeric: tabular-nums;
+.trabalho {
+  height: 100dvh;
+  max-width: 34rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--fundo);
 }
 
-.contagem-amostra strong {
-  font-family: var(--gravado);
-  font-size: 1.15em;
-  color: var(--latao-brilho);
+.trabalho-corpo {
+  flex: 1;
+  min-height: 0;
+  padding: 1rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.carreira-atual {
+  background: var(--superficie);
+  border: 3px solid var(--marca);
+  border-radius: var(--raio);
+  padding: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.carreira-atual .rotulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--acento-texto);
+  margin-bottom: 0.4rem;
+}
+
+.carreira-atual .instrucao {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 /*
   O trecho que a receita manda repetir.
 
-  Colchete desenhado de verdade — traço vertical dos dois lados com as pontas
-  viradas para dentro, que é como se escreve um colchete à mão. Não é aba de
-  cor na lateral: cercar dos dois lados é o que diz "isto aqui é um bloco", e
-  cor num lado só diria outra coisa.
-
-  A cor é a do fio que ela cadastrou, a mesma que pinta o trabalho inteiro. Sob
-  movimento reduzido nada muda: o colchete não se move, ele só existe.
+  A receita escreve entre asteriscos o pedaço que se repete. Asterisco é notação
+  de quem escreve receita, não pontuação de quem lê — então aqui vira colchete
+  desenhado, na cor do fio dela, cercando o trecho dos dois lados. Cercar dos
+  dois lados é o que diz "isto aqui é um bloco"; cor num lado só diria outra
+  coisa.
 */
 .repete {
   position: relative;
   padding: 0 0.42em;
   margin: 0 0.06em;
-  background: color-mix(in srgb, var(--fio) 9%, transparent);
-  border-radius: 2px;
+  background: color-mix(in srgb, var(--fio) 10%, transparent);
+  border-radius: 3px;
 }
 
 .repete::before,
@@ -908,190 +772,74 @@ img.miniatura {
   border-left: none;
 }
 
-/* A moldura sem foto: guarda o lugar sem fingir que há imagem. */
-.miniatura.sem-foto {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--latao-fosco);
-  opacity: 0.55;
-}
-
-.miniatura.sem-foto svg {
-  width: 45%;
-  height: 45%;
-}
-
-/* ------------------------------------------------------------ modo trabalho */
-
-.trabalho {
-  height: 100dvh;
-  max-width: 34rem;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: linear-gradient(180deg, var(--madeira-alta) 0%, var(--madeira) 20%);
-}
-
-.trabalho-corpo {
-  flex: 1;
-  min-height: 0;
-  padding: 1rem;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/*
-  A ETIQUETA. O coração do app: é aqui que ela lê com a agulha na mão, então é
-  papel claro com tinta quase preta — o contraste mais alto da interface
-  inteira — cercado por madeira.
-*/
-.carreira-atual {
-  position: relative;
-  background: var(--etiqueta);
-  color: var(--tinta);
-  border: 0;
-  border-radius: 2px;
-  padding: 1.75rem 1.2rem 1.2rem;
-  margin-bottom: 1.1rem;
-  box-shadow: var(--sombra-etiqueta);
-  overflow: hidden;
-}
-
-/* O furo de fichário da etiqueta presa na gaveta. */
-.carreira-atual::before,
-.carreira-atual::after {
-  content: '';
-  position: absolute;
-  top: 0.75rem;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--madeira);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.6);
-}
-.carreira-atual::before {
-  left: 1.6rem;
-}
-.carreira-atual::after {
-  right: 1.6rem;
-}
-
-/* A linha gravada: parte da peça, número da carreira, lado do trabalho. */
-.carreira-atual .rotulo {
-  font-family: var(--gravado);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.055em;
-  line-height: 1.45;
+/* A instrução é montada a partir da receita, então a maiúscula vem do estilo. */
+.carreira-atual .instrucao::first-letter,
+.passo::first-letter {
   text-transform: uppercase;
-  color: var(--tinta-rotulo);
-  margin-bottom: 0.7rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--etiqueta-sombra);
-  text-wrap: balance;
-}
-
-.carreira-atual .rotulo strong {
-  color: var(--tinta);
 }
 
 /*
-  A amostra do fio: um quadrado da cor que ela cadastrou, com o nome da linha
-  escrito ao lado. Cor nunca vem sozinha, e um app sobre fios finalmente mostra
-  o fio — sem virar barra de cor decorativa.
+  Qual linha está nesta peça, com um quadradinho da cor de verdade do fio ao
+  lado do nome. A cor sozinha nunca informa: o nome vem escrito junto.
 */
 .fio-usado {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   margin-top: 0.7rem;
-  font-family: var(--gravado);
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--tinta-suave);
+  font-size: 0.95rem;
+  color: var(--texto-suave);
 }
 
 .fio-amostra {
   width: 1.1rem;
   height: 1.1rem;
-  border-radius: 2px;
+  border-radius: 0.25rem;
   background: var(--fio);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
 }
 
-/* A instrução: o texto que ela lê. Serifa, corpo grande, medida curta. */
-.carreira-atual .instrucao {
-  font-family: var(--leitura);
-  font-size: 1.5rem;
-  font-weight: 500;
-  line-height: 1.42;
-  color: var(--tinta);
-  max-width: 30ch;
+/* O desenho das telas vazias: o mesmo traço das abas, num quadro maior. */
+.icone-grande svg {
+  width: 100%;
+  height: 100%;
+  stroke-width: 1.1;
 }
 
-.carreira-atual .instrucao::first-letter,
-.passo::first-letter {
-  text-transform: uppercase;
-}
-
-.carreira-atual .suave {
-  color: var(--tinta-suave);
-}
-
-.carreira-atual .botao {
-  background: var(--etiqueta-funda);
-  border-color: var(--etiqueta-aresta);
-  color: var(--tinta);
-}
-
-/* O que vem depois: papel virado, mais apagado, atrás da etiqueta da vez. */
 .carreira-proxima {
-  background: rgba(242, 236, 224, 0.09);
-  border: 1px dashed rgba(212, 168, 60, 0.35);
-  border-radius: 2px;
+  background: var(--superficie-2);
+  border: 2px dashed var(--borda-forte);
+  border-radius: var(--raio);
   padding: 0.85rem 1rem;
   margin-bottom: 1rem;
-  color: var(--sobre-madeira-suave);
-  font-size: 1rem;
-}
-
-.carreira-proxima strong {
-  font-family: var(--gravado);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  font-size: 0.8rem;
-  color: var(--latao);
+  color: var(--texto-suave);
 }
 
 .passos {
   list-style: none;
-  margin: 0.85rem 0 0;
+  margin: 0.8rem 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 .passo {
-  padding: 0.6rem 0.8rem;
-  border-radius: 2px;
-  background: var(--etiqueta-funda);
-  color: var(--tinta);
-  font-size: 1.02rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 0.7rem;
+  background: var(--superficie-2);
+  font-size: 1.05rem;
 }
 
 /*
-  Repetição marcada com colchete, que é como a própria notação de tricô marca
-  um trecho que se repete — e não com uma barra de cor na lateral.
+  O passo que repete ganha colchete, não barra de cor na lateral: aba colorida
+  num lado só é decoração, e o colchete diz a mesma coisa dizendo por quê.
 */
 .passo.repeticao {
   position: relative;
   padding-left: 1.1rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .passo.repeticao::before {
@@ -1101,17 +849,58 @@ img.miniatura {
   top: 0.55rem;
   bottom: 0.55rem;
   width: 5px;
-  border: 1px solid var(--fio);
+  border: 2px solid var(--fio);
   border-right: 0;
 }
 
-/* ------------------------------------------------------- sulco de gavetas */
+.contadores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+}
 
-/*
-  Quanto falta da peça, legível de relance — sem ler número. É o sulco do
-  móvel: a parte feita vira latão, o que falta fica em madeira funda. Vem com
-  texto ao lado, porque cor e comprimento nunca são o único sinal.
-*/
+.contador {
+  background: var(--superficie);
+  border: 2px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 0.8rem;
+  text-align: center;
+}
+
+.contador .nome {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--texto-suave);
+  margin-bottom: 0.2rem;
+}
+
+.contador .valor {
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.contador .voltas {
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+
+.contador-botoes {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.contador-botoes .botao {
+  flex: 1;
+  min-height: 3rem;
+  padding: 0.4rem;
+  font-size: 1.2rem;
+}
+
+/* Quanto da peça já foi, com o que falta escrito em palavra ao lado. */
 .sulco {
   display: flex;
   align-items: center;
@@ -1121,37 +910,26 @@ img.miniatura {
 .sulco-trilho {
   flex: 1;
   height: 14px;
-  border-radius: 2px;
-  background: var(--veio);
-  /* As divisões do móvel: uma marca a cada gaveta do trilho. */
-  background-image: repeating-linear-gradient(
-    90deg,
-    transparent 0 calc(10% - 1px),
-    rgba(212, 168, 60, 0.28) calc(10% - 1px) 10%
-  );
-  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.75), inset 0 -1px 0 rgba(212, 168, 60, 0.12);
+  border-radius: 999px;
+  background: var(--superficie-2);
+  border: 1px solid var(--borda);
   overflow: hidden;
 }
 
-/*
-  Cresce por transform, não por largura: animar largura obriga o navegador a
-  refazer o layout a cada quadro, e isso engasga justo no aparelho mais fraco.
-*/
 .sulco-feito {
   width: 100%;
   height: 100%;
   transform-origin: left center;
-  background: var(--latao);
-  box-shadow: inset 0 1px 0 rgba(255, 246, 214, 0.4);
-  transition: transform var(--tempo-gaveta) var(--saida-gaveta);
+  background: var(--marca);
+  transition: transform var(--tempo-entrada) var(--saida-entrada);
 }
 
 .sulco-conta {
   font-family: var(--gravado);
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: var(--sobre-madeira);
+  color: var(--texto);
   white-space: nowrap;
   text-align: right;
   line-height: 1.15;
@@ -1161,85 +939,26 @@ img.miniatura {
   display: block;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--latao);
+  color: var(--acento-texto);
 }
-
-/* ------------------------------------------------------------- contadores */
-
-.contadores {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  gap: 0.7rem;
-  margin-bottom: 1.1rem;
-}
-
-/* Cada contador é um mostrador de latão embutido na madeira. */
-.contador {
-  background: radial-gradient(120% 100% at 50% 0%, var(--madeira-alta), var(--madeira-baixa));
-  border: 0;
-  border-radius: var(--raio-gaveta);
-  padding: 0.85rem 0.7rem;
-  text-align: center;
-  box-shadow: inset 0 1px 0 rgba(212, 168, 60, 0.2), var(--sombra-gaveta);
-}
-
-.contador .nome {
-  font-family: var(--gravado);
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--latao);
-  margin-bottom: 0.3rem;
-}
-
-/* O número gravado. Tabular, para não dançar ao contar. */
-.contador .valor {
-  font-family: var(--gravado);
-  font-size: 2.6rem;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.01em;
-  color: var(--latao-brilho);
-  font-variant-numeric: tabular-nums;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
-}
-
-.contador .voltas {
-  font-family: var(--gravado);
-  font-size: 0.78rem;
-  letter-spacing: 0.03em;
-  color: var(--sobre-madeira-suave);
-  margin-top: 0.15rem;
-}
-
-.contador-botoes {
-  display: flex;
-  gap: 0.4rem;
-  margin-top: 0.7rem;
-}
-
-.contador-botoes .botao {
-  flex: 1;
-  min-height: var(--alvo);
-  padding: 0.4rem;
-  font-size: 1.3rem;
-  font-family: var(--gravado);
-}
-
-/* --------------------------------------------------------------- o puxador */
 
 /*
   A sombra que diz "tem mais embaixo".
 
-  A área de leitura rola, e o corte no limite dela caía no meio da palavra — "1
-  pa em cada ponto. (135" — com uma linha reta que lê como defeito de tela, não
-  como continuação. O rodapé passa a desenhar uma sombra curta por cima do
-  corte, e só quando há mesmo conteúdo abaixo; parada no fim da rolagem, ela
-  some, porque aí não há nada que ela devesse anunciar.
+  A área de leitura rola, e o corte no limite dela caía no meio da palavra, com
+  uma linha reta que lê como defeito de tela e não como continuação. A sombra só
+  aparece quando há mesmo conteúdo abaixo.
 */
 .trabalho-rodape {
   position: relative;
+  flex-shrink: 0;
+  background: var(--superficie);
+  border-top: 2px solid var(--borda);
+  padding: 0.8rem 1rem;
+  padding-bottom: max(0.8rem, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
 .trabalho-rodape::before {
@@ -1251,7 +970,7 @@ img.miniatura {
   height: 2.2rem;
   pointer-events: none;
   opacity: 0;
-  background: linear-gradient(to top, var(--madeira), transparent);
+  background: linear-gradient(to top, var(--fundo), transparent);
   transition: opacity var(--tempo-toque) var(--saida-toque);
 }
 
@@ -1259,30 +978,14 @@ img.miniatura {
   opacity: 1;
 }
 
-.trabalho-rodape {
-  flex-shrink: 0;
-  background: linear-gradient(180deg, var(--madeira-baixa), var(--veio));
-  border-top: 1px solid var(--latao-fosco);
-  padding: 0.85rem 1rem;
-  padding-bottom: max(0.85rem, env(safe-area-inset-bottom));
-  display: flex;
-  flex-direction: column;
-  gap: 0.7rem;
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
-}
-
 /*
-  A leitura à esquerda, o botão à direita — e o botão desce sozinho para uma
-  linha própria quando os dois não cabem lado a lado.
+  A leitura de tempo à esquerda e o botão à direita — e o botão desce sozinho
+  para uma linha própria quando os dois não cabem. As bases estão em `rem`, que
+  é justamente o que o ajuste de tamanho de letra move.
 
-  As bases estão em `rem`, e `rem` é justamente o que o ajuste de tamanho de
-  letra move: no tamanho normal os dois convivem, e no tamanho "Maior" a soma
-  passa da largura da tela e o botão quebra para baixo por conta própria. Sem
-  isso, a coluna da esquerda espremia a 130px e o bloco crescia de 86px para
-  229px de altura, comendo a tela de leitura.
-
-  Antes era `align-items: center` sobre três caixas de alturas diferentes, o que
-  desalinhava os rótulos em 19px.
+  Duas leituras de mesmo peso brigavam por um espaço que não existe: uma é a
+  resposta que ela quer (quanto tempo esta peça já levou) e a outra só confirma
+  que o relógio está andando.
 */
 .cronometro {
   display: flex;
@@ -1305,38 +1008,40 @@ img.miniatura {
   font-size: 0.8rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--latao);
+  color: var(--acento-texto);
 }
 
 .cronometro .tempo {
-  font-family: var(--gravado);
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.6rem;
+  font-weight: 800;
   line-height: 1.1;
-  color: var(--sobre-madeira);
   font-variant-numeric: tabular-nums;
 }
 
-/* A sessão só confirma que o relógio anda; fica na voz de quem confirma. */
 .sessao-agora {
   margin-top: 0.15rem;
   font-size: 0.82rem;
-  color: var(--sobre-madeira-suave);
+  color: var(--texto-suave);
   font-variant-numeric: tabular-nums;
+}
+
+/* A contagem que ela abre a biblioteca de amostras para ver. */
+.contagem-amostra {
+  margin-top: 0.35rem;
+  font-size: 1.05rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.contagem-amostra strong {
+  font-family: var(--gravado);
+  font-size: 1.15em;
+  color: var(--acento-texto);
 }
 
 .travado-aviso {
   text-align: center;
-  font-family: var(--gravado);
   font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  font-size: 0.9rem;
   color: var(--alerta);
-  padding: 0.5rem;
-  border: 1px dashed var(--alerta);
-  border-radius: 2px;
-  margin-bottom: 0.85rem;
 }
 
 /* --------------------------------------------------------------- diálogo */
@@ -1345,7 +1050,7 @@ img.miniatura {
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: rgba(10, 6, 3, 0.72);
+  background: rgba(20, 12, 8, 0.55);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -1355,30 +1060,27 @@ img.miniatura {
 .dialogo {
   width: 100%;
   max-width: 32rem;
-  background: linear-gradient(180deg, var(--madeira-alta), var(--madeira));
-  border: 1px solid var(--latao-fosco);
-  border-radius: var(--raio-gaveta);
-  padding: 1.2rem;
+  background: var(--superficie);
+  border-radius: var(--raio);
+  padding: 1.25rem;
   max-height: 85dvh;
   overflow-y: auto;
   margin-bottom: env(safe-area-inset-bottom);
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.4), 0 20px 50px rgba(0, 0, 0, 0.6);
 }
 
 .dialogo h2 {
-  font-family: var(--gravado);
   margin-bottom: 0.6rem;
-  color: var(--sobre-madeira);
 }
 
-/* ------------------------------------------------------------------ motion */
-
 /*
-  Um movimento autoral só: a gaveta que entra quando ela avança a carreira.
-  Sai da direita, desacelera como madeira em trilho, e para. Nada de entrada
-  idêntica em toda seção.
+  A carreira nova entra deslizando de leve. É o único movimento autoral do app,
+  e existe para confirmar, no canto do olho, que o toque pegou.
 */
-@keyframes gaveta-entra {
+.carreira-atual {
+  animation: carreira-entra var(--tempo-entrada) var(--saida-entrada);
+}
+
+@keyframes carreira-entra {
   from {
     transform: translateX(14px);
     opacity: 0.55;
@@ -1389,22 +1091,14 @@ img.miniatura {
   }
 }
 
-.carreira-atual {
-  animation: gaveta-entra var(--tempo-gaveta) var(--saida-gaveta);
-}
-
 /*
   Movimento reduzido: sai o deslocamento no espaço, fica o aviso.
 
-  Antes isto era `animation: none !important; transition: none !important` em
-  tudo. Matava junto o retorno de que a carreira mudou — e para quem trabalha
-  com as duas mãos ocupadas, olhando de relance, esse aviso é o próprio produto.
-  Quem pede movimento reduzido está pedindo que as coisas parem de se deslocar,
-  não que a interface pare de responder.
-
-  Fica: a carreira nova aparece com um esmaecer curto, sem escorregar de lado; a
-  sombra de rolagem continua acendendo e apagando. Sai: o deslize da gaveta e o
-  afundar do botão sob o dedo.
+  Antes isto era `animation: none !important` em tudo, o que matava junto o
+  retorno de que a carreira mudou — e para quem trabalha com as duas mãos
+  ocupadas, olhando de relance, esse aviso é o próprio produto. Quem pede
+  movimento reduzido está pedindo que as coisas parem de se deslocar, não que a
+  interface pare de responder.
 */
 @media (prefers-reduced-motion: reduce) {
   .carreira-atual {

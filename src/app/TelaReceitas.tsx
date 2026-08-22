@@ -301,9 +301,9 @@ export function TelaReceitaEditor({ id, navegacao }: { id?: string; navegacao: N
               style={{
                 marginTop: '0.6rem',
                 padding: '0.5rem 0.6rem',
-                background: 'var(--madeira-alta)',
+                background: 'var(--superficie-2)',
                 borderRadius: '0.5rem',
-                color: 'var(--tinta-suave)',
+                color: 'var(--texto-suave)',
                 fontSize: '0.75rem',
                 lineHeight: 1.5,
                 wordBreak: 'break-word',

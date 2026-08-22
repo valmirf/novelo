@@ -77,6 +77,10 @@ Nome: **Novelo**. Voz em português do Brasil, direta e sem jargão de
 computador — a interface fala de carreiras, pontos, linhas e agulhas, nunca de
 "registros" ou "sincronizar".
 
+Paleta: papel claro e marrom de barro, com tema escuro seguindo o aparelho. Um
+redesenho para um mundo de nogueira e latão foi tentado e **desfeito a pedido do
+dono do projeto** — a paleta clara é a decisão, não um estado provisório.
+
 ## Evidence on Hand
 
 - Duas receitas reais da Camila (PDFs de tricô profissional, autoria Cristiane
