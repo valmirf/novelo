@@ -3,6 +3,7 @@ import type { Navegacao } from './App'
 import { repositorio, useAjustes, useLinhas, useProjeto, useReceita } from '../dados/repositorio'
 import { interpretar } from '../nucleo/interpretador'
 import { montarSequencia } from '../nucleo/sequencia'
+import { marcarRepeticoes } from '../nucleo/repeticoes'
 import { IconeAvancar, IconePausar, IconeRetomar, IconeVoltar } from './icones'
 import { aplicarTamanho, contarTamanhos, dependeDoTamanho, nomesDeTamanhos } from '../nucleo/tamanhos'
 import { novoId, type Contador, type Lembrete, type Projeto } from '../nucleo/tipos'
@@ -330,9 +331,13 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
                 que qualquer paráfrase minha, e não corre risco de dizer bobagem.
               */}
               <div className="instrucao">
-                {atual.carreira.contagemConfiavel
-                  ? atual.carreira.resumo
-                  : paraOTamanho(atual.carreira.textoOriginal)}
+                <Instrucao
+                  texto={
+                    atual.carreira.contagemConfiavel
+                      ? atual.carreira.resumo
+                      : paraOTamanho(atual.carreira.textoOriginal)
+                  }
+                />
               </div>
 
               {quantosTamanhos >= 2 &&
@@ -549,20 +554,26 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
           </div>
         )}
 
+        {/*
+          Duas leituras de tempo com o mesmo peso brigavam por um espaço que não
+          existe: no tamanho de letra "Maior" as colunas espremiam a 62px e tudo
+          empilhava. Uma delas é a resposta que ela quer — quanto tempo esta peça
+          já levou — e a outra só confirma que o relógio está andando. Agora o
+          tamanho de cada uma diz isso.
+        */}
         <div className="cronometro">
-          <div>
-            <div className="suave">Nesta sessão</div>
-            <div className="tempo">{formatarDuracao(cronometro.segundos)}</div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div className="suave">No total</div>
-            <div style={{ fontWeight: 700 }}>
+          <div className="leitura-tempo">
+            <div className="suave">Tempo desta peça</div>
+            <div className="tempo">
               {/*
                 Usa a base fixa do início da visita, não o projeto.segundosTotais
                 ao vivo: o retoque periódico já escreve nele por baixo dos panos,
                 e somar cronometro.segundos por cima de novo contaria em dobro.
               */}
               {formatarDuracao((linhaDeBase.current ?? projeto.segundosTotais) + cronometro.segundos)}
+            </div>
+            <div className="sessao-agora">
+              Nesta sessão: {formatarDuracao(cronometro.segundos)}
             </div>
           </div>
           <button
@@ -813,5 +824,33 @@ function DialogoLembrete({
         </div>
       </div>
     </div>
+  )
+}
+
+/**
+ * A instrução da carreira, com o trecho que repete desenhado.
+ *
+ * A receita escreve o pedaço que se repete entre asteriscos. O asterisco é
+ * notação de quem escreve receita, não pontuação de quem lê: mostrar o sinal
+ * cru é entregar a sintaxe da receita para quem o app existe para poupar. Aqui
+ * ele vira colchete de verdade, na cor do fio dela, e o trecho fica visualmente
+ * cercado — que é o que o asterisco queria dizer desde o começo.
+ */
+function Instrucao({ texto }: { texto: string }) {
+  const pedacos = marcarRepeticoes(texto)
+  if (pedacos.length === 1) return <>{texto}</>
+
+  return (
+    <>
+      {pedacos.map((pedaco, indice) =>
+        pedaco.repete ? (
+          <span key={indice} className="repete">
+            {pedaco.texto}
+          </span>
+        ) : (
+          <span key={indice}>{pedaco.texto}</span>
+        ),
+      )}
+    </>
   )
 }

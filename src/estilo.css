@@ -780,6 +780,45 @@ button {
   color: var(--latao-brilho);
 }
 
+/*
+  O trecho que a receita manda repetir.
+
+  Colchete desenhado de verdade — traço vertical dos dois lados com as pontas
+  viradas para dentro, que é como se escreve um colchete à mão. Não é aba de
+  cor na lateral: cercar dos dois lados é o que diz "isto aqui é um bloco", e
+  cor num lado só diria outra coisa.
+
+  A cor é a do fio que ela cadastrou, a mesma que pinta o trabalho inteiro. Sob
+  movimento reduzido nada muda: o colchete não se move, ele só existe.
+*/
+.repete {
+  position: relative;
+  padding: 0 0.42em;
+  margin: 0 0.06em;
+  background: color-mix(in srgb, var(--fio) 9%, transparent);
+  border-radius: 2px;
+}
+
+.repete::before,
+.repete::after {
+  content: '';
+  position: absolute;
+  top: -0.06em;
+  bottom: -0.06em;
+  width: 0.28em;
+  border: 2px solid var(--fio);
+}
+
+.repete::before {
+  left: 0;
+  border-right: none;
+}
+
+.repete::after {
+  right: 0;
+  border-left: none;
+}
+
 /* ------------------------------------------------------------ modo trabalho */
 
 .trabalho {
@@ -1099,16 +1138,33 @@ button {
   box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
 }
 
+/*
+  A leitura à esquerda, o botão à direita — e o botão desce sozinho para uma
+  linha própria quando os dois não cabem lado a lado.
+
+  As bases estão em `rem`, e `rem` é justamente o que o ajuste de tamanho de
+  letra move: no tamanho normal os dois convivem, e no tamanho "Maior" a soma
+  passa da largura da tela e o botão quebra para baixo por conta própria. Sem
+  isso, a coluna da esquerda espremia a 130px e o bloco crescia de 86px para
+  229px de altura, comendo a tela de leitura.
+
+  Antes era `align-items: center` sobre três caixas de alturas diferentes, o que
+  desalinhava os rótulos em 19px.
+*/
 .cronometro {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
   gap: 0.8rem;
-  flex-wrap: nowrap;
 }
 
-.cronometro > div {
+.leitura-tempo {
+  flex: 1 1 9rem;
   min-width: 0;
+}
+
+.cronometro .botao {
+  flex: 1 1 6.5rem;
 }
 
 .cronometro .suave {
@@ -1117,14 +1173,22 @@ button {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--latao);
-  white-space: nowrap;
 }
 
 .cronometro .tempo {
   font-family: var(--gravado);
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 700;
+  line-height: 1.1;
   color: var(--sobre-madeira);
+  font-variant-numeric: tabular-nums;
+}
+
+/* A sessão só confirma que o relógio anda; fica na voz de quem confirma. */
+.sessao-agora {
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+  color: var(--sobre-madeira-suave);
   font-variant-numeric: tabular-nums;
 }
 
