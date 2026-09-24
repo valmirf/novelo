@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { repositorio, useFoto } from '../dados/repositorio'
-import { IconeVoltar } from './icones'
+import { IconeAlerta, IconeCerto, IconeErro, IconeVoltar } from './icones'
 
 /*
-  A marca. Letra de latão aplicada na testeira do móvel — por isso é a mesma
-  condensada gravada dos rótulos de gaveta, e não uma fonte só dela: a marca
-  pertence ao armário, não flutua por cima dele.
+  A marca. Condensada de sinalização na cor de barro, com entreletra larga — é
+  a mesma face dos rótulos do app, e não uma fonte só dela: a marca pertence ao
+  conjunto em vez de flutuar por cima dele.
 */
 export function Marca({ pequena = false }: { pequena?: boolean }) {
   return <span className={pequena ? 'marca pequena' : 'marca'}>Novelo</span>
@@ -142,10 +142,12 @@ export function Aviso({
   tipo?: 'atencao' | 'problema' | 'tudo-certo'
   children: ReactNode
 }) {
-  const simbolo = tipo === 'problema' ? '✕' : tipo === 'tudo-certo' ? '✓' : '!'
+  const Simbolo = tipo === 'problema' ? IconeErro : tipo === 'tudo-certo' ? IconeCerto : IconeAlerta
   return (
     <div className={`aviso ${tipo}`} role={tipo === 'problema' ? 'alert' : undefined}>
-      <span aria-hidden="true">{simbolo}</span>
+      <span className="aviso-marca" aria-hidden="true">
+        <Simbolo />
+      </span>
       <span>{children}</span>
     </div>
   )

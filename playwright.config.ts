@@ -30,6 +30,12 @@ export default defineConfig({
   projects: [
     { name: 'iphone', use: { ...devices['iPhone 13'] } },
     { name: 'android', use: { ...devices['Pixel 7'] } },
+    /*
+      O iPad deitado é o aparelho mais comum de uso, apoiado ao lado do
+      trabalho. É também a única configuração em que o modo trabalho vira duas
+      colunas, então é a única que prova esse caminho.
+    */
+    { name: 'ipad', use: { ...devices['iPad (gen 7) landscape'] } },
   ],
 
   /*

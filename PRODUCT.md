@@ -51,6 +51,11 @@ e nenhum fala português. O Novelo:
   a cada parte (Decote, Cavas, Mangas), instruções relativas a marcadores ("M
   até o Marc 1"), e vários tamanhos na mesma linha ("84 (92, 100, 110) M").
 - Uma peça leva dias ou semanas, em muitas sessões curtas.
+- **O aparelho mais comum de uso é o iPad**, não o celular — e apoiado ao lado
+  do trabalho ele fica deitado. O modo trabalho vira duas colunas nessa largura:
+  a leitura de um lado, os controles do outro. Antes disso, em 1180 por 820, o
+  app ficava com 250px de vazio de cada lado e ao mesmo tempo cortava os
+  contadores dela, exigindo rolagem com metade da tela em branco.
 - Aparelhos reais incluem iPad e iPhone com Safari desatualizado.
 
 ## Capabilities and Constraints

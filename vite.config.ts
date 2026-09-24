@@ -33,7 +33,10 @@ export default defineConfig({
         theme_color: '#fdfaf6',
         background_color: '#fdfaf6',
         display: 'standalone',
-        orientation: 'portrait',
+        /*
+          Sem trava de orientação: o aparelho mais comum de uso é o iPad,
+          apoiado ao lado do trabalho, e nessa posição ele fica deitado.
+        */
         start_url: './',
         scope: './',
         icons: [

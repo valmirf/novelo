@@ -4,7 +4,15 @@ import { repositorio, useAjustes, useLinhas, useProjeto, useReceita } from '../d
 import { interpretar } from '../nucleo/interpretador'
 import { montarSequencia } from '../nucleo/sequencia'
 import { marcarRepeticoes } from '../nucleo/repeticoes'
-import { IconeAvancar, IconePausar, IconeRetomar, IconeVoltar } from './icones'
+import {
+  IconeAlerta,
+  IconeAvancar,
+  IconeDestravado,
+  IconePausar,
+  IconeRetomar,
+  IconeTravado,
+  IconeVoltar,
+} from './icones'
 import { aplicarTamanho, contarTamanhos, dependeDoTamanho, nomesDeTamanhos } from '../nucleo/tamanhos'
 import { novoId, type Contador, type Lembrete, type Projeto } from '../nucleo/tipos'
 import {
@@ -325,7 +333,7 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
         {lembretesAgora.map((lembrete) => (
           <div key={lembrete.id} className="aviso atencao" style={{ display: 'block' }}>
             <div style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.5rem' }}>
-              ⚠ Lembrete desta carreira
+              <IconeAlerta /> Lembrete desta carreira
             </div>
             <div style={{ marginBottom: '0.7rem' }}>{lembrete.texto}</div>
             <button className="botao contorno largo" onClick={() => marcarLembreteVisto(lembrete.id)}>
@@ -335,7 +343,9 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
         ))}
 
         {projeto.travado && (
-          <div className="travado-aviso">🔒 Contagem travada — destrave para contar</div>
+          <div className="travado-aviso">
+            <IconeTravado /> Contagem travada — destrave para contar
+          </div>
         )}
 
         {/*
@@ -592,7 +602,15 @@ export function TelaTrabalho({ projetoId, navegacao }: { projetoId: string; nave
             className="botao contorno"
             onClick={() => void gravar({ travado: !projeto.travado })}
           >
-            {projeto.travado ? '🔓 Destravar' : '🔒 Travar contagem'}
+            {projeto.travado ? (
+              <>
+                <IconeDestravado /> Destravar
+              </>
+            ) : (
+              <>
+                <IconeTravado /> Travar contagem
+              </>
+            )}
           </button>
           <button className="botao contorno" onClick={() => setConfirmandoZerar(true)}>
             Voltar ao começo

@@ -93,7 +93,9 @@ const relatorio = {}
 // O mundo tem dois temas e os dois são entregues à pessoa pelo aparelho dela.
 // Auditar só um seria auditar metade do produto.
 for (const tema of ['light', 'dark']) {
-for (const largura of [320, 390, 768]) {
+// 1180 é o iPad deitado, que é como o aparelho mais comum de uso fica apoiado
+// ao lado do trabalho.
+for (const largura of [320, 390, 768, 1180]) {
   for (const escala of [1, 1.35]) {
     const ctx = await navegador.newContext({
       viewport: { width: largura, height: 780 },

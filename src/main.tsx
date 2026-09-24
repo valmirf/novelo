@@ -1,3 +1,4 @@
+import { IconeAlerta, IconeGrande } from './app/icones'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './app/App'
@@ -24,8 +25,15 @@ banco
       <div className="aplicativo">
         <main className="conteudo">
           <div className="vazio">
+            {/*
+              Sem emoji: este é o único lugar do app que a pessoa vê quando nada
+              funciona, e não é hora de o aparelho desenhar uma figurinha
+              colorida do jeito dele.
+            */}
             <div className="desenho" aria-hidden="true">
-              🧶
+              <IconeGrande>
+                <IconeAlerta />
+              </IconeGrande>
             </div>
             <h2>Não consigo guardar nada neste navegador</h2>
             <p>

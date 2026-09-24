@@ -160,6 +160,57 @@ export function IconeBusca() {
   )
 }
 
+/*
+ * Cadeado, alerta e os dois sinais de resultado.
+ *
+ * Existiam como emoji e como caractere solto — 🔒, 🔓, ⚠, ✓, ✕. Emoji cada
+ * aparelho desenha do seu jeito, em cores que não são as do app, e alguns
+ * viram figurinha colorida no meio de uma frase séria. Desenhados aqui, seguem
+ * o traço do resto e a cor do texto ao lado.
+ */
+export function IconeTravado() {
+  return (
+    <svg {...comum} width={20} height={20}>
+      <rect x="5" y="10.5" width="14" height="9.5" rx="1.5" />
+      <path d="M8.2 10.5V7.8a3.8 3.8 0 0 1 7.6 0v2.7" />
+    </svg>
+  )
+}
+
+export function IconeDestravado() {
+  return (
+    <svg {...comum} width={20} height={20}>
+      <rect x="5" y="10.5" width="14" height="9.5" rx="1.5" />
+      <path d="M8.2 10.5V7.8a3.8 3.8 0 0 1 7.2-1.6" />
+    </svg>
+  )
+}
+
+export function IconeAlerta() {
+  return (
+    <svg {...comum} width={20} height={20}>
+      <path d="M12 4.5 21 19.5H3Z" />
+      <path d="M12 10v4M12 16.6h.01" />
+    </svg>
+  )
+}
+
+export function IconeCerto() {
+  return (
+    <svg {...comum} width={20} height={20}>
+      <path d="M5 12.5 10 17.5 19 7" />
+    </svg>
+  )
+}
+
+export function IconeErro() {
+  return (
+    <svg {...comum} width={20} height={20}>
+      <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />
+    </svg>
+  )
+}
+
 /**
  * As telas vazias pedem um desenho maior que o da aba. É o mesmo traço, só
  * que num quadro maior — sistema de ícone único, não dois.

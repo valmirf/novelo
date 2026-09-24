@@ -1038,7 +1038,19 @@ img.miniatura {
   color: var(--acento-texto);
 }
 
+/* O desenho dentro de um aviso: alinhado com a primeira linha do texto. */
+.aviso-marca {
+  display: flex;
+  flex-shrink: 0;
+  align-items: flex-start;
+  padding-top: 0.1rem;
+}
+
 .travado-aviso {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
   text-align: center;
   font-weight: 700;
   color: var(--alerta);
@@ -1116,5 +1128,68 @@ img.miniatura {
   }
   to {
     opacity: 1;
+  }
+}
+
+/* ----------------------------------------------------------------- tela larga */
+
+/*
+  O iPad é o aparelho mais comum de uso, apoiado ao lado do trabalho — e nessa
+  posição ele fica deitado.
+
+  Numa tela de 1180 por 820 o modo trabalho ficava com 250px de vazio de cada
+  lado e, ao mesmo tempo, com a leitura espremida: o rodapé comia 600px dos 820
+  de altura e os contadores dela ficavam cortados, exigindo rolagem com metade
+  da tela em branco.
+
+  Aqui ele vira duas colunas: a leitura de um lado, os controles do outro. É a
+  mesma informação, sem rolagem e sem desperdício — e a mão continua achando o
+  botão "Próxima carreira" sempre no mesmo lugar.
+*/
+@media (min-width: 60rem) and (min-height: 30rem) {
+  .trabalho {
+    max-width: 74rem;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    grid-template-rows: auto minmax(0, 1fr);
+    column-gap: 1.2rem;
+    padding-right: 1rem;
+  }
+
+  .trabalho > .cabecalho {
+    grid-column: 1 / -1;
+  }
+
+  .trabalho-corpo {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  /*
+    O rodapé deixa de ser rodapé e vira a coluna da direita: a borda muda de
+    cima para a esquerda, porque agora o que ele separa está ao lado e não
+    embaixo.
+  */
+  .trabalho-rodape {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+    max-height: 100%;
+    overflow-y: auto;
+    border-top: none;
+    border-left: 2px solid var(--borda);
+    background: none;
+    padding: 1rem 0 1rem 1.2rem;
+    gap: 1rem;
+  }
+
+  /* A sombra dizia "tem mais embaixo"; ao lado, não há embaixo. */
+  .trabalho-rodape::before {
+    content: none;
+  }
+
+  /* Com a coluna inteira para si, a leitura pode crescer. */
+  .carreira-atual .instrucao {
+    font-size: 1.7rem;
   }
 }

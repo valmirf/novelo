@@ -107,6 +107,20 @@ Nada disto é cor, e por isso nada disto voltou atrás:
 - **O estado vazio da miniatura**, a escala de espaço, os tokens de movimento e
   a suavização de fonte no tema escuro.
 
+## Tela larga
+
+O iPad deitado é o aparelho mais comum de uso. A partir de 60rem de largura (com
+ao menos 30rem de altura), o modo trabalho vira **duas colunas**: a leitura à
+esquerda, os controles à direita, com o rodapé virando coluna e a borda mudando
+de cima para a esquerda. A sombra de rolagem some ali, porque ao lado não há
+embaixo.
+
+Sem isso, numa tela de 1180 por 820 o app ocupava 680px no meio com 250px de
+vazio de cada lado, e ainda assim cortava os contadores.
+
+O manifesto **não trava orientação**: declarar retrato num app usado em iPad
+apoiado ao lado do trabalho é declarar errado.
+
 ## Movimento
 
 Um momento autoral só: a carreira que entra deslizando ao avançar
@@ -117,7 +131,10 @@ esmaecer de 160ms sem deslocamento.
 ## Ícones
 
 Conjunto autoral em `src/app/icones.tsx`, traço único de 1.6, sem preenchimento.
-Nenhum emoji: cada aparelho desenha o seu.
+Nenhum emoji e nenhum caractere solto fazendo papel de ícone. Cinco tinham
+sobrevivido ao redesenho — 🧶, ⚠, 🔒, 🔓 e o par ✓/✕ dos avisos — e foram
+desenhados: emoji cada aparelho pinta do seu jeito, em cores que não são as do
+app, e alguns viram figurinha colorida no meio de uma frase séria.
 
 Registro de tentativas falhas, para ninguém repetir: novelo com retas cruzadas e
 novelo com arcos **leem como sinal de proibido** no tamanho da aba — por isso o
