@@ -29,7 +29,8 @@ export default defineConfig({
         short_name: 'Novelo',
         description: 'Receitas, contadores, cronômetro e inventário de linhas e agulhas.',
         lang: 'pt-BR',
-        theme_color: '#7c4a3a',
+        // Igual ao fundo do cabeçalho: a barra do celular vira continuação da tela.
+        theme_color: '#fdfaf6',
         background_color: '#fdfaf6',
         display: 'standalone',
         orientation: 'portrait',
@@ -38,7 +39,13 @@ export default defineConfig({
         icons: [
           { src: 'icone-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icone-512.png', sizes: '512x512', type: 'image/png' },
-          { src: 'icone-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          /*
+            Recortável tem arquivo próprio. O Android corta o ícone em círculo,
+            losango ou quadrado arredondado conforme o aparelho, e o desenho
+            precisa caber na zona segura de 80% — no ícone normal o rabinho do
+            novelo ficava fora dela e era cortado.
+          */
+          { src: 'icone-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {

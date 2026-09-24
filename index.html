@@ -3,12 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/icone.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
-    <meta name="theme-color" content="#fdfaf6" />
+    <!--
+      Sem maximum-scale: o zoom com dois dedos é do aparelho dela, não meu.
+      Travar o zoom num app feito para quem enxerga mal é o contrário do que se
+      quer, e reprova a regra 1.4.4 da WCAG.
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fdfaf6" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1a1512" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Novelo" />
-    <link rel="apple-touch-icon" href="/icone-192.png" />
+    <link rel="apple-touch-icon" href="/icone-180.png" />
     <title>Novelo</title>
   </head>
   <body>
